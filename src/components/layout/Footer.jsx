@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 
 export default function Footer() {
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setLoggedInUser(JSON.parse(userStr));
+      } catch (e) {
+        // ignore error
+      }
+    }
+  }, []);
+
   return (
     <footer id="contact" className="bg-[#0A0A0A] text-white pt-12 md:pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -27,9 +40,9 @@ export default function Footer() {
             <h4 className="font-semibold mb-6 text-lg">Company</h4>
             <ul className="space-y-4 text-sm text-gray-400">
               <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
-              <li><Link to="/browse-chefs" className="hover:text-accent transition-colors">Our Chefs</Link></li>
-              {/* <li><Link to="/blog" className="hover:text-accent transition-colors">Blog</Link></li> */}
-              <li><Link to="/careers" className="hover:text-accent transition-colors">Careers</Link></li>
+              {loggedInUser?.role !== 'chef' && (
+                <li><Link to="/browse-chefs" className="hover:text-accent transition-colors">Our Chefs</Link></li>
+              )}
             </ul>
           </div>
 

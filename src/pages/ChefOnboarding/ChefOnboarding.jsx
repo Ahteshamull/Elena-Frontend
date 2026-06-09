@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -70,6 +70,23 @@ const ChefOnboarding = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedLanguages, setSelectedLanguages] = useState(['ENGLISH']);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        const role = user?.role?.toLowerCase() || '';
+        if (role !== 'chef') {
+          navigate('/');
+        }
+      } catch (e) {
+        navigate('/');
+      }
+    } else {
+      navigate('/login');
+    }
+  }, [navigate]);
   const [selectedCuisines, setSelectedCuisines] = useState(['FRENCH', 'Vegetarian', 'Organic', 'Interfusion', 'Healthy meal prep']);
   const [selectedCategory, setSelectedCategory] = useState('PERSONAL');
   const [selectedMenuTier, setSelectedMenuTier] = useState('GOURMET');

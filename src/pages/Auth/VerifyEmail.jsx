@@ -131,10 +131,10 @@ const VerifyEmail = () => {
     // Redirect after brief success animation
     await new Promise((res) => setTimeout(res, 1000));
     if (resolvedRole === 'chef') {
-      // Land on chef dashboard — onboarding is triggered later via "Set Up Profile"
-      navigate('/chef-dashboard', { replace: true });
+      // Land on chef onboarding instead of dashboard
+      navigate('/chef-onboarding', { replace: true });
     } else {
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     }
   };
 

@@ -77,7 +77,7 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Browse Chefs', path: '/browse-chefs' },
+    ...(loggedInUser?.role !== 'chef' ? [{ name: 'Browse Chefs', path: '/browse-chefs' }] : []),
     { name: 'How it works', path: '/how-it-works' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },

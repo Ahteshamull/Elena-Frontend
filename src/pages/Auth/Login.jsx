@@ -45,9 +45,9 @@ const Login = () => {
     
     // Redirect based on role
     if (role === 'chef') {
-      navigate('/chef-dashboard');
+      navigate('/chef-onboarding');
     } else {
-      navigate('/dashboard');
+      navigate('/');
     }
   };
 

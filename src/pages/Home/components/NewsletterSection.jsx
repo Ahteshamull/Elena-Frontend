@@ -12,7 +12,7 @@ export default function NewsletterSection() {
           Subscribe for exclusive chef interviews, seasonal menu inspirations, and priority access to pop-up events.
         </p>
 
-        <form className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+        {/* <form className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
           <input
             type="email"
             placeholder="Email address"
@@ -25,7 +25,7 @@ export default function NewsletterSection() {
           >
             SUBSCRIBE
           </button>
-        </form>
+        </form> */}
       </div>
     </section>
   );
