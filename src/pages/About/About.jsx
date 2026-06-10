@@ -273,9 +273,7 @@ export default function About() {
                   Browse Our Chefs
                 </Button>
               </Link>
-              <Button variant="outline" className="w-full sm:w-auto rounded-full px-8 py-3.5 text-sm h-auto border-white/30 text-white hover:bg-white/10 font-medium backdrop-blur-sm">
-                Application
-              </Button>
+            
             </div>
           </div>
         </div>

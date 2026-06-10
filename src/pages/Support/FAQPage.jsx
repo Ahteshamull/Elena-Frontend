@@ -1,32 +1,30 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '../../utils/cn';
-
-const faqItems = [
-  {
-    question: "How do I book a private chef?",
-    answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-  },
-  {
-    question: "What is included in the service fee?",
-    answer: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-  },
-  {
-    question: "Can I customize the menu?",
-    answer: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
-  },
-  {
-    question: "How far in advance should I book?",
-    answer: "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
-  },
-  {
-    question: "What happens if I need to cancel?",
-    answer: "Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus."
-  }
-];
+import { useGetAllFaqsQuery } from '../../redux/api/faqApi';
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = React.useState(0);
+  const { data, isLoading, error } = useGetAllFaqsQuery();
+
+  const faqItems = data?.data?.faqs || [];
+
+  if (isLoading) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <p className="text-gray-500">Loading FAQs...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pt-32 pb-24 min-h-screen bg-[#FAFAFA] flex items-center justify-center">
+        <p className="text-gray-500">Failed to load FAQs.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-32 pb-24 min-h-screen bg-[#FAFAFA]">
@@ -82,9 +80,12 @@ export default function FAQPage() {
         <div className="mt-16 p-8 bg-primary-900 rounded-[32px] text-white text-center">
           <h3 className="text-xl font-serif italic mb-2">Still have questions?</h3>
           <p className="text-white/60 text-sm mb-6">We're here to help you create the perfect dining experience.</p>
-          <button className="bg-accent text-primary-900 px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white transition-colors">
+          <Link 
+            to="/contact"
+            className="inline-block bg-accent text-primary-900 px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-white transition-colors"
+          >
             Contact Support
-          </button>
+          </Link>
         </div>
       </div>
     </div>

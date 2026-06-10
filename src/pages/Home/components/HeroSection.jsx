@@ -6,6 +6,9 @@ import { Button } from '../../../components/ui/Button';
 
 export default function HeroSection() {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [location, setLocation] = useState('');
+  const [date, setDate] = useState('');
+  const [guests, setGuests] = useState('');
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -62,7 +65,7 @@ export default function HeroSection() {
               <MapPin className="text-gray-400 shrink-0" size={18} />
               <div className="flex flex-col w-full">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Location</span>
-                <input type="text" placeholder="Where to?" className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm" />
+                <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where to?" className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm" />
               </div>
             </div>
 
@@ -70,7 +73,7 @@ export default function HeroSection() {
               <Calendar className="text-gray-400 shrink-0" size={18} />
               <div className="flex flex-col w-full">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</span>
-                <input type="date" className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm cursor-pointer" />
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm cursor-pointer" />
               </div>
             </div>
 
@@ -78,11 +81,11 @@ export default function HeroSection() {
               <Users className="text-gray-400 shrink-0" size={18} />
               <div className="flex flex-col w-full">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Guests</span>
-                <input type="number" min="1" placeholder="Add guests" className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm" />
+                <input type="number" value={guests} onChange={(e) => setGuests(e.target.value)} min="1" placeholder="Add guests" className="w-full bg-transparent border-none outline-none text-primary-900 placeholder:text-gray-400 focus:ring-0 p-0 text-sm" />
               </div>
             </div>
 
-            <div className="flex-1 flex items-center gap-3 px-4 py-2">
+            {/* <div className="flex-1 flex items-center gap-3 px-4 py-2">
               <Search className="text-gray-400 shrink-0" size={18} />
               <div className="flex flex-col w-full">
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Event Type</span>
@@ -94,9 +97,12 @@ export default function HeroSection() {
                   <option value="cooking-class">Cooking Class</option>
                 </select>
               </div>
-            </div>
+            </div> */}
 
-            <Link to="/browse-chefs" className="block w-full md:w-auto">
+            <Link 
+              to={(!location && !date && !guests) ? "#" : "/browse-chefs"} 
+              className={`block w-full md:w-auto ${(!location && !date && !guests) ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}`}
+            >
               <Button variant="primary" className="w-full h-12 md:h-14 px-6 md:px-8 rounded-xl shrink-0 gap-2 font-semibold">
                 <Search size={18} />
                 Find a Chef
