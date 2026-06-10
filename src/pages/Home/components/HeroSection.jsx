@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { MapPin, Calendar, Users, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button';
@@ -31,19 +32,31 @@ export default function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full mt-16 md:mt-20">
-        <div className="max-w-2xl text-white">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-2xl mx-auto text-center text-white"
+        >
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-cursive mb-4 md:mb-6 leading-tight">
             Exquisite Private Dining,<br />Tailored to You
           </h1>
           
-          <p className="text-base md:text-lg lg:text-xl text-gray-200 mb-8 md:mb-12 max-w-lg">
+          <p className="text-base md:text-lg lg:text-xl text-gray-200 mb-8 md:mb-12 max-w-lg mx-auto">
             Experience the ultimate culinary journey with our curated private chefs.
           </p>
-        </div>
+        </motion.div>
 
         {/* Search Bar Container */}
         {loggedInUser?.role !== 'chef' && (
-          <div className="bg-white/95 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-stretch gap-3 md:gap-4 max-w-5xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="bg-white/95 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl flex flex-col md:flex-row items-stretch gap-3 md:gap-4 max-w-5xl mx-auto"
+          >
             
             <div className="flex-1 flex items-center gap-3 px-4 py-2 border-b md:border-b-0 md:border-r border-gray-200">
               <MapPin className="text-gray-400 shrink-0" size={18} />
@@ -90,7 +103,7 @@ export default function HeroSection() {
               </Button>
             </Link>
             
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

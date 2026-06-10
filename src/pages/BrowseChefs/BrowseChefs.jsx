@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import FiltersSidebar from './components/FiltersSidebar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { chefsData } from '../../constants/mockData';
@@ -12,6 +12,17 @@ export default function BrowseChefs() {
     maxPrice: 1000
   });
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBookNow = (e, chefId) => {
+    e.preventDefault();
+    const user = localStorage.getItem('user');
+    if (!user) {
+      navigate('/login', { state: { from: `/book/${chefId}` } });
+    } else {
+      navigate(`/book/${chefId}`);
+    }
+  };
 
   const filteredChefs = chefsData.filter(chef => {
     // Location Filter
@@ -136,11 +147,13 @@ export default function BrowseChefs() {
                       <Link to={`/chef-profile`} className="text-xs font-bold text-gray-500 hover:text-primary-900 uppercase tracking-widest transition-colors">
                         View Profile
                       </Link>
-                      <Link to={`/book/${chef.id}`}>
-                        <Button variant="primary" className="rounded-none px-6 py-3 font-semibold text-sm">
-                          Book Now
-                        </Button>
-                      </Link>
+                      <Button 
+                        variant="primary" 
+                        className="rounded-none px-6 py-3 font-semibold text-sm"
+                        onClick={(e) => handleBookNow(e, chef.id)}
+                      >
+                        Book Now
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

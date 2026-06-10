@@ -20,7 +20,7 @@ const VerifyEmail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const userData = location.state || {};
-  const { email = '', name = '', role = 'guest' } = userData;
+  const { email = '', name = '', role = 'guest', from = '/' } = userData;
 
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''));
   const [error, setError] = useState('');
@@ -134,7 +134,7 @@ const VerifyEmail = () => {
       // Land on chef onboarding instead of dashboard
       navigate('/chef-onboarding', { replace: true });
     } else {
-      navigate('/', { replace: true });
+      navigate(from, { replace: true });
     }
   };
 

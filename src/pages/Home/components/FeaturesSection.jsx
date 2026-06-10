@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Award, Clock, Leaf } from 'lucide-react';
 
 export default function FeaturesSection() {
@@ -7,7 +8,13 @@ export default function FeaturesSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
           
-          <div className="order-2 lg:order-1">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8 }}
+            className="order-2 lg:order-1"
+          >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif mb-8 md:mb-12 leading-tight">
               The Standards of Global Gastronomy. In Your Home
             </h2>
@@ -43,9 +50,15 @@ export default function FeaturesSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="order-1 lg:order-2">
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8 }}
+            className="order-1 lg:order-2"
+          >
             <div className="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl">
               {/* Using provided local image */}
               <img 
@@ -54,7 +67,7 @@ export default function FeaturesSection() {
                 className="w-full h-full object-cover"
               />
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </div>

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { User, Mail, Lock, Eye, EyeOff, UserPlus, Utensils, ChefHat, CheckCircle2 } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { AuthLayout } from './AuthLayout';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -20,6 +20,7 @@ const registerSchema = z.object({
 
 const Register = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'chef' ? 'chef' : 'guest';
   const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +63,7 @@ const Register = () => {
         email: data.email,
         name: data.fullName,
         role: data.role,
+        from: location.state?.from,
       },
     });
   };

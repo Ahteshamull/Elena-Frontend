@@ -1,9 +1,16 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function TestimonialSection() {
   return (
     <section className="py-20 md:py-32 bg-[#FAFAFA] text-center">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, margin: "-100px" }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl mx-auto px-4 sm:px-6"
+      >
         <div className="mb-8 md:mb-10 flex justify-center">
           <span className="text-5xl md:text-6xl text-accent font-serif leading-none">"</span>
         </div>
@@ -23,7 +30,7 @@ export default function TestimonialSection() {
             <div className="text-gray-500 text-xs md:text-sm">Villa Owner, Mallorca</div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

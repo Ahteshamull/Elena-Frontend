@@ -22,6 +22,7 @@ import FAQPage from './pages/Support/FAQPage';
 import Careers from './pages/Support/Careers';
 import Booking from './pages/Booking/Booking';
 import { VerifyEmail } from './pages/Auth/VerifyEmail';
+import CancellationPolicy from './pages/Support/cancellation';
 
 function App() {
   return (
@@ -50,6 +51,8 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/careers" element={<Careers />} />
+            <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+            <Route path="/refund-policy" element={<CancellationPolicy />} />
             <Route path="/dashboard/*" element={<Dashboard />} />
             <Route path="/chef-dashboard/*" element={<ChefDashboard />} />
             {/* <Route path="/admin/*" element={<AdminDashboard />} /> */}
