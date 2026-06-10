@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useCreateUserMutation } from '../../redux/api/authApi';
+import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,6 +27,7 @@ const Register = () => {
   const initialRole = searchParams.get('role') === 'chef' ? 'chef' : 'guest';
   const [showPassword, setShowPassword] = useState(false);
   const [selectedRole, setSelectedRole] = useState(initialRole);
+  const [createUser, { isLoading: isRegisterLoading }] = useCreateUserMutation();
   
   const {
     register,
@@ -55,17 +58,38 @@ const Register = () => {
   }, [searchParams, setValue]);
 
 
-  const onSubmit = (data) => {
-    // Navigate to OTP verification — pass all user details in router state.
-    // The session is only persisted to localStorage after the code is verified.
-    navigate('/verify-email', {
-      state: {
+  const onSubmit = async (data) => {
+    try {
+      const response = await createUser({
+        userName: data.fullName,
         email: data.email,
-        name: data.fullName,
-        role: data.role,
-        from: location.state?.from,
-      },
-    });
+        password: data.password,
+        confirmPassword: data.password, // Frontend sets this dynamically if missing in UI
+        role: data.role === 'guest' ? 'user' : 'chef', // Map guest to user
+      }).unwrap();
+
+      // Navigate to OTP verification — pass all user details in router state.
+      if (response.success || response) { // Accommodate standard success flags
+        toast.success(response.message || 'Registration successful!');
+        
+        navigate('/verify-email', {
+          state: {
+            email: data.email,
+            name: data.fullName,
+            role: data.role === 'guest' ? 'user' : 'chef',
+            from: location.state?.from,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Failed to create account:', err);
+      // Display the specific error message from the backend if it exists
+      if (err?.data?.message) {
+        toast.error(err.data.message);
+      } else {
+        toast.error('Failed to create account. Please try again.');
+      }
+    }
   };
 
   const handleRoleSelect = (role) => {
@@ -193,7 +217,8 @@ const Register = () => {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isSubmitting}
+            isLoading={isSubmitting || isRegisterLoading}
+            loadingText="Creating Account..."
             className="h-16 rounded-2xl bg-black hover:bg-gray-900 text-white font-bold text-lg flex gap-3 shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] mt-4"
           >
             <UserPlus size={20} />

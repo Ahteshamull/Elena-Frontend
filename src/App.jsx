@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home/Home';
@@ -23,6 +25,7 @@ import Careers from './pages/Support/Careers';
 import Booking from './pages/Booking/Booking';
 import { VerifyEmail } from './pages/Auth/VerifyEmail';
 import CancellationPolicy from './pages/Support/cancellation';
+import ProtectedRoute from './components/layout/ProtectedRoute';
 
 function App() {
   return (
@@ -53,13 +56,36 @@ function App() {
             <Route path="/careers" element={<Careers />} />
             <Route path="/cancellation-policy" element={<CancellationPolicy />} />
             <Route path="/refund-policy" element={<CancellationPolicy />} />
-            <Route path="/dashboard/*" element={<Dashboard />} />
-            <Route path="/chef-dashboard/*" element={<ChefDashboard />} />
+            <Route 
+              path="/dashboard/*" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chef-dashboard/*" 
+              element={
+                <ProtectedRoute allowedRoles={['chef']}>
+                  <ChefDashboard />
+                </ProtectedRoute>
+              } 
+            />
             {/* <Route path="/admin/*" element={<AdminDashboard />} /> */}
           </Routes>
         </main>
         <Footer />
       </div>
+      <ToastContainer 
+        position="top-center" 
+        autoClose={3000} 
+        hideProgressBar={true} 
+        closeOnClick 
+        pauseOnHover 
+        theme="colored"
+        toastClassName="custom-toast"
+      />
     </Router>
   );
 }

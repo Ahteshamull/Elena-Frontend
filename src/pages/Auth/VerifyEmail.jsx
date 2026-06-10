@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useVerifyRegistrationMutation } from '../../redux/api/authApi';
+import { toast } from 'react-toastify';
 import { MailCheck, RotateCcw, ShieldCheck } from 'lucide-react';
 import { AuthLayout } from './AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../utils/cn';
 
-const VALID_OTP = '123456';
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
 
@@ -24,8 +25,8 @@ const VerifyEmail = () => {
 
   const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''));
   const [error, setError] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [verifyRegistration, { isLoading: isVerifying }] = useVerifyRegistrationMutation();
   const [countdown, setCountdown] = useState(RESEND_SECONDS);
   const [canResend, setCanResend] = useState(false);
 
@@ -101,40 +102,53 @@ const VerifyEmail = () => {
       return;
     }
 
-    setIsVerifying(true);
+    try {
+      const response = await verifyRegistration({ email, otp: code }).unwrap();
+      
+      if (response.success || response) {
+        toast.success(response.message || 'Email verified successfully!');
+        
+        const resolvedRole = role === 'chef' ? 'chef' : 'user';
+        const userDataToSave = {
+          ...response.data,
+          email,
+          name,
+          role: resolvedRole,
+        };
 
-    // Simulate async network call
-    await new Promise((res) => setTimeout(res, 1200));
+        // Save tokens and user data
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('user', JSON.stringify(userDataToSave));
 
-    if (code !== VALID_OTP) {
-      setIsVerifying(false);
-      setError('Invalid verification code. Please try again.');
+        // Save to cookies as well
+        if (response.accessToken && response.refreshToken) {
+          document.cookie = `accessToken=${response.accessToken}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `refreshToken=${response.refreshToken}; path=/; max-age=2592000; SameSite=Lax`;
+          document.cookie = `user=${encodeURIComponent(JSON.stringify(userDataToSave))}; path=/; max-age=86400; SameSite=Lax`;
+        }
+
+        setIsSuccess(true);
+
+        // Redirect after brief success animation
+        await new Promise((res) => setTimeout(res, 1000));
+        if (resolvedRole === 'chef') {
+          navigate('/chef-onboarding', { replace: true });
+        } else {
+          navigate('/login', { replace: true });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to verify OTP:', err);
+      if (err?.data?.message) {
+        setError(err.data.message);
+        toast.error(err.data.message);
+      } else {
+        setError('Invalid verification code. Please try again.');
+        toast.error('Verification failed.');
+      }
       setDigits(Array(OTP_LENGTH).fill(''));
       inputRefs.current[0]?.focus();
-      return;
-    }
-
-    // Persist session
-    const resolvedRole = role === 'chef' ? 'chef' : 'user';
-    localStorage.setItem('user', JSON.stringify({
-      email,
-      name,
-      role: resolvedRole,
-      // Chefs must complete profile setup separately via "Set Up Profile" in the navbar.
-      // Guests have no setup step, so profileSetup is true immediately.
-      profileSetup: resolvedRole === 'chef' ? false : true,
-    }));
-
-    setIsSuccess(true);
-    setIsVerifying(false);
-
-    // Redirect after brief success animation
-    await new Promise((res) => setTimeout(res, 1000));
-    if (resolvedRole === 'chef') {
-      // Land on chef onboarding instead of dashboard
-      navigate('/chef-onboarding', { replace: true });
-    } else {
-      navigate(from, { replace: true });
     }
   };
 
@@ -265,10 +279,7 @@ const VerifyEmail = () => {
           )}
         </div>
 
-        {/* Helper hint (dev only) */}
-        <p className="text-center text-[11px] text-gray-300 italic -mt-2">
-          Dev hint: use code <span className="font-mono font-bold text-gray-400">123456</span> to verify
-        </p>
+
 
       </div>
     </AuthLayout>
