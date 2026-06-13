@@ -130,16 +130,16 @@ export default function FiltersSidebar({ filters, setFilters, isOpen, onClose })
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Price Range</h4>
         <input 
           type="range" 
-          min="100" 
-          max="1000" 
+          min="1" 
+          max="100" 
           value={filters.maxPrice}
           onChange={(e) => setFilters({ ...filters, maxPrice: parseInt(e.target.value) })}
           className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-900 mb-2" 
         />
         <div className="flex justify-between text-xs text-gray-500">
-          <span>$100</span>
+          <span>$1</span>
           <span className="text-primary-900 font-medium">Up to ${filters.maxPrice} per guest</span>
-          <span>$5000</span>
+          <span>$100</span>
         </div>
       </div>
 
@@ -148,6 +148,8 @@ export default function FiltersSidebar({ filters, setFilters, isOpen, onClose })
         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Availability</h4>
         <input 
           type="date" 
+          value={filters.date || ''}
+          onChange={(e) => setFilters({ ...filters, date: e.target.value })}
           className="w-full bg-transparent border-b border-gray-300 outline-none text-primary-900 focus:border-primary-900 py-2 text-sm cursor-pointer" 
         />
       </div>

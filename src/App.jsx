@@ -13,6 +13,7 @@ import Contact from './pages/Contact/Contact';
 import ChefProfile from './pages/ChefProfile/ChefProfile';
 import { Login } from './pages/Auth/Login';
 import { Register } from './pages/Auth/Register';
+import ForgotPass from './pages/Auth/Forgot-Pass';
 import { ChefOnboarding } from './pages/ChefOnboarding/ChefOnboarding';
 import ChefDashboard from './pages/ChefDashboard/ChefDashboard';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -23,6 +24,9 @@ import { Terms, Privacy } from './pages/Support/Legal';
 import FAQPage from './pages/Support/FAQPage';
 import Careers from './pages/Support/Careers';
 import Booking from './pages/Booking/Booking';
+import Checkout from './pages/Checkout/Checkout';
+import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import Messages from './pages/Messages/Messages';
 import { VerifyEmail } from './pages/Auth/VerifyEmail';
 import CancellationPolicy from './pages/Support/cancellation';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -42,10 +46,26 @@ function App() {
             <Route path="/about" element={<About />} />
             {/* <Route path="/blog" element={<Blog />} /> */}
             <Route path="/contact" element={<Contact />} />
-            <Route path="/chef-profile" element={<ChefProfile />} />
+            <Route path="/chef/:id" element={<ChefProfile />} />
             <Route path="/book/:chefId" element={<Booking />} />
+            <Route path="/checkout/:bookingId" element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            } />
+            <Route path="/payment/success" element={
+              <ProtectedRoute>
+                <PaymentSuccess />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPass />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/chef-onboarding" element={<ChefOnboarding />} />
             <Route path="/help" element={<HelpCenter />} />

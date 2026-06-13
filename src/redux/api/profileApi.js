@@ -10,7 +10,10 @@ export const profileApi = apiSlice.injectEndpoints({
         body: formData,
       }),
     }),
+    getProfileByUserId: builder.query({
+      query: (id) => `/profile/user/${id}`,
+    }),
   }),
 });
 
-export const { useSetupProfileMutation } = profileApi;
+export const { useSetupProfileMutation, useGetProfileByUserIdQuery } = profileApi;

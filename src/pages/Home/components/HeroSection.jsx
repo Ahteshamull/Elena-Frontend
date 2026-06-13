@@ -100,7 +100,7 @@ export default function HeroSection() {
             </div> */}
 
             <Link 
-              to={(!location && !date && !guests) ? "#" : "/browse-chefs"} 
+              to={(!location && !date && !guests) ? "#" : `/browse-chefs?location=${encodeURIComponent(location)}&date=${encodeURIComponent(date)}&guests=${encodeURIComponent(guests)}`} 
               className={`block w-full md:w-auto ${(!location && !date && !guests) ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}`}
             >
               <Button variant="primary" className="w-full h-12 md:h-14 px-6 md:px-8 rounded-xl shrink-0 gap-2 font-semibold">

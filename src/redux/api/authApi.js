@@ -23,7 +23,46 @@ export const authApi = apiSlice.injectEndpoints({
         body: verifyData,
       }),
     }),
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    verifyResetOtp: builder.mutation({
+      query: (data) => ({
+        url: "/auth/verify-reset-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({ data, token }) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
+    resendOtp: builder.mutation({
+      query: (data) => ({
+        url: "/auth/resend-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useCreateUserMutation, useVerifyRegistrationMutation } = authApi;
+export const { 
+  useLoginMutation, 
+  useCreateUserMutation, 
+  useVerifyRegistrationMutation,
+  useForgotPasswordMutation,
+  useVerifyResetOtpMutation,
+  useResetPasswordMutation,
+  useResendOtpMutation
+} = authApi;
