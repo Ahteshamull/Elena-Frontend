@@ -141,25 +141,39 @@ export default function Header() {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
-              <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-full border border-gray-100">
-                <Link
-                  to={getDashboardUrl(loggedInUser)}
-                  className="flex items-center gap-2 text-sm font-bold text-primary-900 hover:bg-white transition-all px-4 py-2 rounded-full"
-                >
-                  <User size={16} className="text-accent" />
-                  Dashboard
-                </Link>
+              <div className="flex items-center gap-4">
+                {loggedInUser?.role !== "chef" && (
+                  <Link to="/register?role=chef">
+                    <Button
+                      variant="primary"
+                      className="moving-border-btn rounded-full px-6 h-10 text-sm font-bold"
+                    >
+                      <span className="relative z-10">Join as a chef</span>
+                    </Button>
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-full border border-gray-100">
+                  {!location.pathname.includes('/chef-onboarding') && (
+                    <Link
+                      to={getDashboardUrl(loggedInUser)}
+                      className="flex items-center gap-2 text-sm font-bold text-primary-900 hover:bg-white transition-all px-4 py-2 rounded-full"
+                    >
+                      <User size={16} className="text-accent" />
+                      Dashboard
+                    </Link>
+                  )}
 
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 group shadow-sm"
-                  title="Logout"
-                >
-                  <LogOut
-                    size={18}
-                    className="group-hover:-translate-x-0.5 transition-transform"
-                  />
-                </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100 group shadow-sm"
+                    title="Logout"
+                  >
+                    <LogOut
+                      size={18}
+                      className="group-hover:-translate-x-0.5 transition-transform"
+                    />
+                  </button>
+                </div>
               </div>
             ) : (
               <>
@@ -177,14 +191,6 @@ export default function Header() {
                     className="rounded-full px-6 h-10 text-sm font-bold"
                   >
                     Sign up
-                  </Button>
-                </Link>
-                <Link to="/register?role=chef">
-                  <Button
-                    variant="primary"
-                    className="moving-border-btn rounded-full px-6 h-10 text-sm font-bold"
-                  >
-                    <span className="relative z-10">Join as a chef</span>
                   </Button>
                 </Link>
               </>
@@ -248,14 +254,29 @@ export default function Header() {
             <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-100">
               {isLoggedIn ? (
                 <>
-                  <Link
-                    to={getDashboardUrl(loggedInUser)}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-center gap-3 text-sm font-bold text-primary-900 bg-gray-50 hover:bg-primary-50 transition-all duration-200 py-4 px-4 rounded-2xl w-full"
-                  >
-                    <User size={18} className="text-accent" />
-                    Dashboard Overview
-                  </Link>
+                  {loggedInUser?.role !== "chef" && (
+                    <Link
+                      to="/register?role=chef"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <Button
+                        variant="primary"
+                        className="moving-border-btn rounded-full px-6 w-full h-12 text-base font-bold"
+                      >
+                        <span className="relative z-10">Join as a chef</span>
+                      </Button>
+                    </Link>
+                  )}
+                  {!location.pathname.includes('/chef-onboarding') && (
+                    <Link
+                      to={getDashboardUrl(loggedInUser)}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center justify-center gap-3 text-sm font-bold text-primary-900 bg-gray-50 hover:bg-primary-50 transition-all duration-200 py-4 px-4 rounded-2xl w-full"
+                    >
+                      <User size={18} className="text-accent" />
+                      Dashboard Overview
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="flex items-center justify-center gap-3 text-sm font-black text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-200 py-4 px-4 rounded-2xl w-full uppercase tracking-widest"
@@ -283,17 +304,6 @@ export default function Header() {
                       className="rounded-full px-6 w-full h-12 text-base font-bold"
                     >
                       Sign up
-                    </Button>
-                  </Link>
-                  <Link
-                    to="/register?role=chef"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <Button
-                      variant="primary"
-                      className="moving-border-btn rounded-full px-6 w-full h-12 text-base font-bold"
-                    >
-                      <span className="relative z-10">Join as a chef</span>
                     </Button>
                   </Link>
                 </>

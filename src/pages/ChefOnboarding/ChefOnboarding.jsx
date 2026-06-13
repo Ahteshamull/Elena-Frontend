@@ -82,6 +82,8 @@ const ChefOnboarding = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(step === 1 ? step1Schema : step === 2 ? step2Schema : step3Schema),
+    shouldUnregister: false,
+    mode: 'onChange',
     defaultValues: {
       languages: ['ENGLISH'],
       cuisines: ['FRENCH', 'Vegetarian', 'Organic', 'Interfusion', 'Healthy meal prep'],
@@ -295,13 +297,24 @@ const ChefOnboarding = () => {
               isSubmitting={isSubmitting}
               isSubmittingAPI={isSubmittingAPI}
               onPreviewClick={() => setShowPreview(true)}
+              onBackClick={() => setStep(prev => prev - 1)}
             />
           </div>
         )}
 
         {/* Footer Action (Step 1 & 2 only) */}
         {step < 3 && (
-          <div className="flex flex-col items-center gap-4 pt-8">
+          <div className="flex items-center justify-center gap-4 pt-8">
+            {step > 1 && (
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={() => setStep(prev => prev - 1)}
+                className="px-12 py-5 rounded-none font-bold text-xs tracking-widest uppercase transition-all"
+              >
+                Go Back
+              </Button>
+            )}
             <Button 
               type="submit" 
               disabled={isSubmitting}
@@ -309,15 +322,6 @@ const ChefOnboarding = () => {
             >
               Continue <MoveRight size={16} />
             </Button>
-            {step > 1 && (
-              <button 
-                type="button" 
-                onClick={() => setStep(prev => prev - 1)}
-                className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-primary-900 transition-colors"
-              >
-                Go Back
-              </button>
-            )}
           </div>
         )}
 

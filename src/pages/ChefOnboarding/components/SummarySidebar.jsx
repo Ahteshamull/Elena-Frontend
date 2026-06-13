@@ -7,6 +7,7 @@ const SummarySidebar = ({
   isSubmitting,
   isSubmittingAPI,
   onPreviewClick,
+  onBackClick,
 }) => {
   const summaryItems = [
     { label: 'Identity & Background', status: 'VERIFIED', icon: CheckCircle2, active: true },
@@ -57,6 +58,14 @@ const SummarySidebar = ({
             className="w-full py-5 rounded-xl font-black text-[9px] tracking-[0.2em] uppercase border-gray-100 hover:bg-gray-50"
           >
             Profile Preview
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={onBackClick}
+            className="w-full py-5 rounded-xl font-black text-[9px] tracking-[0.2em] uppercase border-gray-100 hover:bg-gray-50"
+          >
+            Go Back
           </Button>
         </div>
       </div>
