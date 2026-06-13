@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+import { useCreateContactMutation } from '../../redux/api/contactApi';
 
 export default function Contact() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -10,31 +11,32 @@ export default function Contact() {
     window.scrollTo(0, 0);
   }, []);
 
+  const [createContact] = useCreateContactMutation();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulating a form submission
-    // In a real scenario, you would use a service like Web3Forms or Formspree
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
     
+    const names = data.name.trim().split(" ");
+    const firstName = names[0];
+    const lastName = names.slice(1).join(" ") || "User"; // Backend requires lastName
+    
+    const apiFormData = new FormData();
+    apiFormData.append("firstName", firstName);
+    apiFormData.append("lastName", lastName);
+    apiFormData.append("email", data.email);
+    apiFormData.append("subject", data.subject);
+    apiFormData.append("message", data.message);
+    
     try {
-      // Example of how to send to a service:
-      // await fetch("https://api.web3forms.com/submit", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     access_key: "YOUR_ACCESS_KEY_HERE",
-      //     ...data
-      //   })
-      // });
+      await createContact(apiFormData).unwrap();
       
-      console.log("Form submitted:", data);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-      }, 1500);
+      console.log("Form submitted successfully");
+      setIsSubmitting(false);
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Error submitting form:", error);
       setIsSubmitting(false);

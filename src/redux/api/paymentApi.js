@@ -8,7 +8,13 @@ export const paymentApi = apiSlice.injectEndpoints({
         method: 'POST',
       }),
     }),
+    verifyPayment: builder.query({
+      query: (sessionId) => ({
+        url: `/payment/verify/${sessionId}`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
-export const { useCreateCheckoutSessionMutation } = paymentApi;
+export const { useCreateCheckoutSessionMutation, useVerifyPaymentQuery } = paymentApi;

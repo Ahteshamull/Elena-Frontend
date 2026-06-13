@@ -2,10 +2,14 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CheckCircle2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { useVerifyPaymentQuery } from '../../redux/api/paymentApi';
 
 export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+
+  // Verify the payment to ensure DB updates and emails are sent (especially useful for local testing without webhooks)
+  const { data: verificationData, isLoading } = useVerifyPaymentQuery(sessionId, { skip: !sessionId });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -22,9 +26,13 @@ export default function PaymentSuccess() {
         </div>
 
         <span className="text-[10px] font-bold text-[#E5C37A] uppercase tracking-[0.25em] mb-3">Escrow Secured</span>
-        <h1 className="text-4xl font-serif font-medium text-primary-900 mb-4 leading-tight">Payment Successful</h1>
+        <h1 className="text-4xl font-serif font-medium text-primary-900 mb-4 leading-tight">
+          {isLoading ? "Verifying Payment..." : "Payment Successful"}
+        </h1>
         <p className="text-gray-500 text-sm max-w-sm mb-8">
-          Your payment has been successfully processed and is held securely in escrow. A confirmation email has been sent.
+          {isLoading 
+            ? "Please wait while we confirm your payment securely..."
+            : "Your payment has been successfully processed and is held securely in escrow. A confirmation email has been sent."}
         </p>
 
         {sessionId && (
