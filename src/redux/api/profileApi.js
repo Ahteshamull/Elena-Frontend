@@ -13,7 +13,15 @@ export const profileApi = apiSlice.injectEndpoints({
     getProfileByUserId: builder.query({
       query: (id) => `/profile/user/${id}`,
     }),
+    updateProfile: builder.mutation({
+      query: (formData) => ({
+        url: '/profile/update-profile',
+        method: 'PATCH',
+        body: formData,
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
-export const { useSetupProfileMutation, useGetProfileByUserIdQuery } = profileApi;
+export const { useSetupProfileMutation, useGetProfileByUserIdQuery, useUpdateProfileMutation } = profileApi;

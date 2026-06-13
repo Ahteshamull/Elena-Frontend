@@ -24,9 +24,26 @@ import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Badge } from '../../../components/ui/Badge';
 import { cn } from '../../../utils/cn';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useGetCurrentUserQuery, useDeleteMyAccountMutation } from '../../../redux/api/authApi';
+import { useUpdateUserProfileMutation } from '../../../redux/api/userApi';
 
 const Profile = () => {
+  const { data: userRes, isLoading } = useGetCurrentUserQuery();
+  const profileData = userRes?.data;
+
+  const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserProfileMutation();
+  const [deleteAccount, { isLoading: isDeleting }] = useDeleteMyAccountMutation();
+  
+  const navigate = useNavigate();
+
   // --- States ---
+  const [fullName, setFullName] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [languages, setLanguages] = React.useState('');
+  const [aboutMe, setAboutMe] = React.useState('');
+
   const [dietary, setDietary] = React.useState(['Peanuts', 'Shellfish', 'Dairy-Free']);
   const [cuisines, setCuisines] = React.useState(['French Gastronomy', 'Modern Italian', 'Japanese Omakase']);
   const [isAddingDietary, setIsAddingDietary] = React.useState(false);
@@ -47,9 +64,32 @@ const Profile = () => {
   const [isSuccess, setIsSuccess] = React.useState(false);
 
   const [addresses, setAddresses] = React.useState([
-    { id: 1, label: 'Home', address: '123 Malibu Coast, California', icon: Home, isEditing: false },
-    { id: 2, label: 'Vacation Home', address: '45 Beverly Hills Drive, CA', icon: Briefcase, isEditing: false }
+    { id: 1, label: 'Home', address: 'Loading...', icon: Home, isEditing: false }
   ]);
+
+  React.useEffect(() => {
+    if (profileData?.profile || profileData) {
+      setFullName(profileData?.profile?.fullName || profileData?.userName || '');
+      setPhone(profileData?.profile?.phone || profileData?.phone || '');
+      setLanguages(profileData?.profile?.languages?.join(", ") || 'English');
+      setAboutMe(profileData?.profile?.aboutMe || '');
+
+      if (profileData?.profile?.cuisineSpecialties?.length > 0) {
+        setCuisines(profileData?.profile?.cuisineSpecialties);
+      }
+      
+      const locs = [];
+      if (profileData?.profile?.city || profileData?.profile?.country) {
+        locs.push({ id: 1, label: 'Primary Location', address: `${profileData?.profile?.city || ''}, ${profileData?.profile?.country || ''}`.replace(/^,\s*/, ''), icon: Home, isEditing: false });
+      }
+      if (profileData?.profile?.travelRadiusLocation) {
+        locs.push({ id: 2, label: 'Service Area', address: profileData?.profile?.travelRadiusLocation, icon: Briefcase, isEditing: false });
+      }
+      if (locs.length > 0) {
+        setAddresses(locs);
+      }
+    }
+  }, [profileData]);
 
   // --- Handlers ---
   const toggleEditAddress = (id) => {
@@ -83,12 +123,53 @@ const Profile = () => {
     }
   };
 
+  const handleUpdateProfile = async () => {
+    try {
+      // Build a single FormData combining User and Profile fields
+      const formData = new FormData();
+      formData.append('userName', fullName);
+      formData.append('phone', phone);
+      formData.append('aboutMe', aboutMe);
+      
+      cuisines.forEach(c => formData.append('cuisineSpecialties', c));
+      
+      const langArray = languages.split(',').map(l => l.trim()).filter(Boolean);
+      langArray.forEach(l => formData.append('languages', l));
+
+      // Call the unified update endpoint
+      await updateUser(formData).unwrap();
+
+      toast.success("Profile updated successfully!");
+      triggerSuccess();
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      toast.error(error?.data?.message || "Failed to update profile. Please try again.");
+    }
+  };
+
   const triggerSuccess = () => {
     setIsSuccess(true);
     setTimeout(() => {
       setIsSuccess(false);
       setActiveModal(null);
     }, 2000);
+  };
+
+  const handleDeactivateAccount = async () => {
+    try {
+      await deleteAccount().unwrap();
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      triggerSuccess();
+      setTimeout(() => {
+        navigate('/');
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Failed to deactivate account:", error);
+      alert("Failed to deactivate account. Please try again.");
+    }
   };
 
   // --- Components ---
@@ -149,35 +230,60 @@ const Profile = () => {
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                 <div className="relative group shrink-0">
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-accent/20">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200" alt="Profile" className="w-full h-full object-cover" />
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-accent/20 bg-gray-50">
+                    <img 
+                      src={profileData?.profile?.image ? (profileData.profile.image.startsWith('http') ? profileData.profile.image : `http://localhost:8005${profileData.profile.image}`) : "/b_1.png"} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
                   <button className="absolute bottom-0 right-0 w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary-900 text-white flex items-center justify-center border-4 border-white hover:bg-black transition-colors shadow-lg">
                     <Camera size={12} />
                   </button>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <h4 className="text-xl md:text-2xl font-serif text-primary-900 italic">Tanvir Ahmed</h4>
-                  <p className="text-xs text-gray-400 font-medium">Elite Member since May 2024</p>
+                  <h4 className="text-xl md:text-2xl font-serif text-primary-900 italic">
+                    {profileData?.profile?.fullName || profileData?.userName || "Loading..."}
+                  </h4>
+                  <p className="text-xs text-gray-400 font-medium">
+                    Member since {profileData?.createdAt ? new Date(profileData.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "..."}
+                  </p>
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                  <Input defaultValue="Tanvir Ahmed" className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" />
+                  <Input 
+                    value={fullName} 
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" 
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-                  <Input defaultValue="tanvir@example.com" disabled className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 opacity-60" />
+                  <Input 
+                    value={profileData?.email || ""} 
+                    disabled 
+                    className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 opacity-60" 
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                  <Input defaultValue="+1 (555) 000-0000" className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" />
+                  <Input 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" 
+                  />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Primary Language</label>
-                  <Input defaultValue="English (US)" className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" />
+                  <Input 
+                    value={languages} 
+                    onChange={(e) => setLanguages(e.target.value)}
+                    placeholder="e.g. English, French"
+                    className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" 
+                  />
                 </div>
               </div>
             </div>
@@ -276,8 +382,10 @@ const Profile = () => {
 
                 {/* Kitchen Equipment Notes */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Special Kitchen Notes</label>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">About Me & Special Notes</label>
                   <textarea 
+                    value={aboutMe}
+                    onChange={(e) => setAboutMe(e.target.value)}
                     placeholder="e.g. Professional convection oven available, Induction cooktop..."
                     className="w-full p-6 bg-gray-50 border-transparent rounded-2xl text-sm min-h-[100px] focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
@@ -405,9 +513,13 @@ const Profile = () => {
 
       {/* Save Button */}
       <div className="mt-8 md:mt-12 flex justify-center">
-        <Button className="bg-primary-900 text-white hover:bg-black rounded-full w-full sm:w-auto px-10 md:px-16 py-5 md:py-6 text-sm font-black tracking-widest uppercase shadow-2xl flex items-center justify-center gap-4 group transition-all hover:scale-105">
-          Update Profile Information
-          <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+        <Button 
+          onClick={handleUpdateProfile}
+          disabled={isUpdatingUser}
+          className="bg-primary-900 text-white hover:bg-black rounded-full w-full sm:w-auto px-10 md:px-16 py-5 md:py-6 text-sm font-black tracking-widest uppercase shadow-2xl flex items-center justify-center gap-4 group transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+        >
+          {isUpdatingUser ? 'Updating...' : 'Update Profile Information'}
+          {!isUpdatingUser && <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />}
         </Button>
       </div>
 
@@ -483,10 +595,10 @@ const Profile = () => {
         <ModalOverlay
           title="Deactivate Account"
           description="This action is irreversible. All your data will be permanently removed."
-          confirmText="Confirm Deactivation"
+          confirmText={isDeleting ? "Deactivating..." : "Confirm Deactivation"}
           variant="danger"
-          onClose={() => setActiveModal(null)}
-          onConfirm={triggerSuccess}
+          onClose={() => !isDeleting && setActiveModal(null)}
+          onConfirm={handleDeactivateAccount}
         >
           <div className="p-6 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-4">
             <AlertTriangle className="text-red-600 mt-1" size={24} />

@@ -3,7 +3,8 @@ import FiltersSidebar from './components/FiltersSidebar';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { useGetAllUsersQuery } from '../../redux/api/userApi';
+import { useGetAllUsersQuery, useGetFavoritesQuery, useToggleFavoriteMutation } from '../../redux/api/userApi';
+import { Heart } from 'lucide-react';
 
 export default function BrowseChefs() {
   const navigate = useNavigate();
@@ -33,6 +34,11 @@ export default function BrowseChefs() {
     limit: itemsPerPage
   });
   
+  const userToken = localStorage.getItem('accessToken');
+  const { data: favoritesRes } = useGetFavoritesQuery(undefined, { skip: !userToken });
+  const favoriteChefs = favoritesRes?.data || [];
+  const [toggleFavorite] = useToggleFavoriteMutation();
+  
   const allChefs = response?.data || [];
   const meta = response?.meta || {};
   const backendTotalPages = meta.totalPages || 1;
@@ -44,6 +50,21 @@ export default function BrowseChefs() {
       navigate('/login', { state: { from: `/book/${chefId}` } });
     } else {
       navigate(`/book/${chefId}`);
+    }
+  };
+
+  const handleToggleFavorite = async (e, chefId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const user = localStorage.getItem('accessToken');
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await toggleFavorite(chefId).unwrap();
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
     }
   };
 
@@ -192,6 +213,8 @@ export default function BrowseChefs() {
                   ? new Date(Math.min(...availableDates.map(d => new Date(d)))).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                   : "Check availability";
 
+                const isFavorite = favoriteChefs.some(fav => fav.favoritedUserId?._id === id || fav.favoritedUserId === id);
+
                 return (
                   <Card key={id} className="group border-transparent shadow-none transition-all duration-300">
                     <Link to={`/chef/${id}`} className="block relative h-72 overflow-hidden rounded-t-2xl">
@@ -207,6 +230,16 @@ export default function BrowseChefs() {
                             Verified Professional
                           </span>
                         )}
+                      </div>
+                      
+                      {/* Favorite Button */}
+                      <div className="absolute top-4 right-4 z-10">
+                        <button 
+                          onClick={(e) => handleToggleFavorite(e, id)}
+                          className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-red-500 shadow-lg hover:bg-white transition-colors"
+                        >
+                          <Heart size={20} fill={isFavorite ? "currentColor" : "none"} strokeWidth={isFavorite ? 0 : 2} />
+                        </button>
                       </div>
                     </Link>
                     <CardContent className="pt-6 px-4 bg-[#FAFAFA]">

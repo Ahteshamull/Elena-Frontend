@@ -10,55 +10,41 @@ import {
   ChevronRight,
   CheckCircle2,
   Clock,
-  RotateCcw
+  RotateCcw,
+  Loader2
 } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { cn } from '../../../utils/cn';
+import { useGetClientBookingsQuery } from '../../../redux/api/bookingApi';
 
 const MyBookings = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('upcoming');
 
+  const { data: bookingsRes, isLoading } = useGetClientBookingsQuery();
+  const allBookings = bookingsRes?.data || [];
+
+  // Categorize bookings
   const bookings = {
-    upcoming: [
-      {
-        id: "BK-9021",
-        chef: "Chef Julian Vasseur",
-        date: "May 24, 2026",
-        time: "7:00 PM",
-        location: "Malibu Villa, CA",
-        guests: 6,
-        total: "$1,850",
-        status: "Confirmed",
-        image: "https://images.unsplash.com/photo-1583394293214-28dea15ee548?auto=format&fit=crop&q=80&w=200"
-      },
-      {
-        id: "BK-8842",
-        chef: "Chef Elena Rossi",
-        date: "June 12, 2026",
-        time: "8:30 PM",
-        location: "Santa Monica Residence",
-        guests: 4,
-        total: "$1,200",
-        status: "Pending",
-        image: "https://images.unsplash.com/photo-1595273670150-db0a3d39074f?auto=format&fit=crop&q=80&w=200"
-      }
-    ],
-    past: [
-      {
-        id: "BK-7120",
-        chef: "Chef Marcus Thorne",
-        date: "April 02, 2026",
-        time: "7:30 PM",
-        location: "Bel Air Estate",
-        guests: 8,
-        total: "$2,400",
-        status: "Completed",
-        image: "https://images.unsplash.com/photo-1566554273541-37a9ca77b91f?auto=format&fit=crop&q=80&w=200"
-      }
-    ]
+    upcoming: allBookings.filter(b => ['pending', 'confirmed'].includes(b.bookingDetails?.status)),
+    past: allBookings.filter(b => ['completed', 'cancelled'].includes(b.bookingDetails?.status))
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'TBD';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const getImageUrl = (url) => {
+    if (!url || url === 'undefined' || url === 'null') return "https://images.unsplash.com/photo-1583394293214-28dea15ee548?auto=format&fit=crop&q=80&w=200";
+    if (url.startsWith('http')) return url;
+    return url.startsWith('/') ? `http://localhost:8005${url}` : `http://localhost:8005/${url}`;
   };
 
   return (
@@ -105,30 +91,37 @@ const MyBookings = () => {
 
       {/* Bookings List */}
       <div className="flex flex-col gap-4">
-        {bookings[activeTab].length > 0 ? (
+        {isLoading ? (
+          <div className="py-20 flex justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary-900" />
+          </div>
+        ) : bookings[activeTab].length > 0 ? (
           bookings[activeTab].map((booking) => (
-            <Card key={booking.id} className="p-0 border-transparent shadow-sm hover:shadow-md transition-all overflow-hidden bg-white">
+            <Card key={booking.bookingDetails._id} className="p-0 border-transparent shadow-sm hover:shadow-md transition-all overflow-hidden bg-white">
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-48 h-44 sm:h-auto overflow-hidden shrink-0">
-                  <img src={booking.image} alt={booking.chef} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(booking.chefInfo?.image || booking.chefInfo?.profile?.image)} alt={booking.chefInfo?.userName || 'Chef'} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
                   <div className="flex-1 flex flex-col gap-3 md:gap-4">
                     <div className="flex items-start justify-between">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">{booking.id}</span>
-                        <h3 className="text-xl font-bold text-primary-900">{booking.chef}</h3>
+                        <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">
+                          {booking.bookingDetails._id.substring(0, 8).toUpperCase()}
+                        </span>
+                        <h3 className="text-xl font-bold text-primary-900">{booking.chefInfo?.userName || booking.chefInfo?.fullName || 'A Chef'}</h3>
                       </div>
                       <Badge 
-                        variant={booking.status === 'Confirmed' ? 'success' : booking.status === 'Pending' ? 'default' : 'secondary'}
+                        variant={booking.bookingDetails.status === 'confirmed' ? 'success' : booking.bookingDetails.status === 'pending' ? 'default' : 'secondary'}
                         className={cn(
                           "px-4 py-1.5 rounded-full font-black text-[9px] tracking-widest uppercase",
-                          booking.status === 'Confirmed' ? "bg-green-50 text-green-700" : 
-                          booking.status === 'Pending' ? "bg-amber-50 text-amber-700" :
+                          booking.bookingDetails.status === 'confirmed' ? "bg-green-50 text-green-700" : 
+                          booking.bookingDetails.status === 'pending' ? "bg-amber-50 text-amber-700" :
+                          booking.bookingDetails.status === 'cancelled' ? "bg-red-50 text-red-700" :
                           "bg-gray-100 text-gray-500"
                         )}
                       >
-                        {booking.status}
+                        {booking.bookingDetails.status}
                       </Badge>
                     </div>
 
@@ -138,28 +131,28 @@ const MyBookings = () => {
                           <Calendar size={14} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Date</span>
                         </div>
-                        <span className="text-xs font-bold text-primary-900">{booking.date}</span>
+                        <span className="text-xs font-bold text-primary-900">{formatDate(booking.bookingDetails.eventDate)}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-gray-400">
                           <Clock size={14} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Time</span>
                         </div>
-                        <span className="text-xs font-bold text-primary-900">{booking.time}</span>
+                        <span className="text-xs font-bold text-primary-900">{booking.bookingDetails.arrivalTime}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-gray-400">
                           <MapPin size={14} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Location</span>
                         </div>
-                        <span className="text-xs font-bold text-primary-900 truncate max-w-[150px]">{booking.location}</span>
+                        <span className="text-xs font-bold text-primary-900 truncate max-w-[150px]">{booking.bookingDetails.eventLocation || 'TBD'}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2 text-gray-400">
                           <ChefHat size={14} />
                           <span className="text-[10px] font-bold uppercase tracking-widest">Total</span>
                         </div>
-                        <span className="text-xs font-bold text-primary-900">{booking.total}</span>
+                        <span className="text-xs font-bold text-primary-900">${booking.bookingDetails.totalAmount?.toLocaleString() || 0}</span>
                       </div>
                     </div>
                   </div>
@@ -167,14 +160,14 @@ const MyBookings = () => {
                   <div className="flex md:flex-col gap-3">
                     <Button 
                       className="flex-1 md:w-40 py-3 rounded-xl bg-primary-900 text-white text-[10px] font-black tracking-widest uppercase shadow-lg"
-                      onClick={() => navigate(`/dashboard/bookings/${booking.id}/manage`)}
+                      onClick={() => navigate(`/dashboard/bookings/${booking.bookingDetails._id}/manage`)}
                     >
                       {activeTab === 'upcoming' ? 'Manage' : 'Re-book'}
                     </Button>
                     <Button 
                       variant="outline" 
                       className="flex-1 md:w-40 py-3 rounded-xl border-gray-100 text-[10px] font-black tracking-widest uppercase"
-                      onClick={() => navigate(`/dashboard/bookings/${booking.id}`)}
+                      onClick={() => navigate(`/dashboard/bookings/${booking.bookingDetails._id}`)}
                     >
                       {activeTab === 'upcoming' ? 'Details' : 'Invoice'}
                     </Button>

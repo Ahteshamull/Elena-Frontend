@@ -54,6 +54,19 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getCurrentUser: builder.query({
+      query: () => ({
+        url: "/auth/current-user-login",
+        method: "POST",
+      }),
+      providesTags: ['User']
+    }),
+    deleteMyAccount: builder.mutation({
+      query: () => ({
+        url: "/auth/delete-my-account",
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -64,5 +77,7 @@ export const {
   useForgotPasswordMutation,
   useVerifyResetOtpMutation,
   useResetPasswordMutation,
-  useResendOtpMutation
+  useResendOtpMutation,
+  useGetCurrentUserQuery,
+  useDeleteMyAccountMutation
 } = authApi;

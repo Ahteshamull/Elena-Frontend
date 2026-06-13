@@ -15,7 +15,29 @@ export const userApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    getFavorites: builder.query({
+      query: () => ({
+        url: '/user/favorites',
+        method: 'GET',
+      }),
+      providesTags: ['Favorites'],
+    }),
+    toggleFavorite: builder.mutation({
+      query: (chefId) => ({
+        url: `/user/favorite/${chefId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Favorites'],
+    }),
+    updateUserProfile: builder.mutation({
+      query: (formData) => ({
+        url: '/user/update-profile',
+        method: 'PATCH',
+        body: formData,
+      }),
+      invalidatesTags: ['User'], // Assuming it updates user info which may be cached
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery } = userApi;
+export const { useGetAllUsersQuery, useGetFavoritesQuery, useToggleFavoriteMutation, useUpdateUserProfileMutation } = userApi;
