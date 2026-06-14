@@ -27,7 +27,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: `/user/favorite/${chefId}`,
         method: 'POST',
       }),
-      invalidatesTags: ['Favorites'],
+      invalidatesTags: ['Favorites', 'Dashboard'],
     }),
     updateUserProfile: builder.mutation({
       query: (formData) => ({

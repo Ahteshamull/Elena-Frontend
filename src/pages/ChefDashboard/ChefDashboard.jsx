@@ -4,10 +4,12 @@ import { ChefSidebar } from './components/ChefSidebar';
 import { ChefBottomNav } from './components/ChefBottomNav';
 import ChefOverview from './components/ChefOverview';
 import ChefBookings from './components/ChefBookings';
+import ChefBookingDetails from './components/ChefBookingDetails';
 import ChefMenus from './components/ChefMenus';
 import ChefEarnings from './components/ChefEarnings';
 import ChefProfileSettings from './components/ChefProfileSettings';
 import ChefMessages from './components/ChefMessages';
+import ChefBankOnboarding from './components/ChefBankOnboarding';
 
 const ChefDashboard = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -27,10 +29,12 @@ const ChefDashboard = () => {
           <Routes>
             <Route index element={<ChefOverview />} />
             <Route path="bookings" element={<ChefBookings />} />
+            <Route path="bookings/:id" element={<ChefBookingDetails />} />
             <Route path="menus" element={<ChefMenus />} />
             <Route path="earnings" element={<ChefEarnings />} />
             <Route path="messages" element={<ChefMessages />} />
             <Route path="profile" element={<ChefProfileSettings />} />
+            <Route path="bank-onboarding" element={<ChefBankOnboarding />} />
             <Route path="*" element={<Navigate to="/chef-dashboard" replace />} />
           </Routes>
         </div>

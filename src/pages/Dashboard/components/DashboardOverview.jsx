@@ -8,38 +8,40 @@ import {
   ArrowRight, 
   ChefHat, 
   ShieldCheck,
-  CreditCard
+  CreditCard,
+  Loader2
 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { Card } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
+import { useGetUserDashboardQuery } from '../../../redux/api/dashboardApi';
 
 const DashboardOverview = () => {
   const navigate = useNavigate();
 
-  // Mock data for upcoming booking
-  const nextBooking = {
-    chefName: "Chef Julian Vasseur",
-    date: "May 24, 2026",
-    time: "7:00 PM",
-    location: "Malibu Villa, CA",
-    experience: "Gourmet Experience (5 Courses)",
-    image: "https://images.unsplash.com/photo-1577219491135-ce39a73e4f83?auto=format&fit=crop&q=80&w=300",
-    status: "Confirmed"
-  };
+  const { data: dashboardRes, isLoading } = useGetUserDashboardQuery();
+  const overview = dashboardRes?.data?.overview || {};
 
   const stats = [
-    { label: "Total Bookings", value: "12", icon: Calendar, color: "bg-blue-50 text-blue-600" },
-    { label: "Saved Chefs", value: "8", icon: ChefHat, color: "bg-orange-50 text-orange-600" },
-    { label: "Account Status", value: "Verified", icon: ShieldCheck, color: "bg-green-50 text-green-600" },
+    { label: "Total Bookings", value: overview.totalBookings || "0", icon: Calendar, color: "bg-blue-50 text-blue-600" },
+    { label: "Saved Chefs", value: overview.savedChefs || "0", icon: ChefHat, color: "bg-orange-50 text-orange-600" },
+    { label: "Account Status", value: overview.accountStatus || "Pending", icon: ShieldCheck, color: "bg-green-50 text-green-600" },
   ];
+
+  const nextBooking = overview.nextBooking;
+
+  if (isLoading) {
+    return <div className="py-20 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary-900" /></div>;
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Welcome Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">Welcome back, Tanvir</h1>
-        <p className="text-gray-500 font-medium text-sm md:text-base">Your next culinary experience is scheduled in 9 days.</p>
+        <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">Welcome back, {overview.userName || 'Guest'}</h1>
+        <p className="text-gray-500 font-medium text-sm md:text-base">
+          {nextBooking ? `Your next culinary experience is scheduled on ${nextBooking.date}.` : "You don't have any upcoming experiences scheduled yet."}
+        </p>
       </div>
 
       {/* Stats Grid */}
@@ -81,58 +83,71 @@ const DashboardOverview = () => {
             </Button>
           </div>
           
-          <Card className="overflow-hidden border-transparent shadow-xl relative group">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-2/5 relative h-52 md:h-auto">
-                <img src={nextBooking.image} alt={nextBooking.chefName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute top-4 left-4">
-                  <Badge variant="success" className="bg-white/90 backdrop-blur-md text-green-700 border-none font-black px-4">{nextBooking.status}</Badge>
+          {nextBooking ? (
+            <Card className="overflow-hidden border-transparent shadow-xl relative group">
+              <div className="flex flex-col md:flex-row">
+                <div className="md:w-2/5 relative h-52 md:h-auto">
+                  <img src={nextBooking.image} alt={nextBooking.chefName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute top-4 left-4">
+                    <Badge variant="success" className="bg-white/90 backdrop-blur-md text-green-700 border-none font-black px-4">{nextBooking.status}</Badge>
+                  </div>
+                </div>
+                <div className="md:w-3/5 p-5 md:p-8 flex flex-col gap-4 md:gap-6 bg-white">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase">Private Chef Experience</span>
+                    <h4 className="text-xl md:text-2xl font-serif text-primary-900">{nextBooking.chefName}</h4>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-y-4">
+                    <div className="flex items-center gap-3">
+                      <Calendar size={16} className="text-gray-400" />
+                      <span className="text-xs font-bold text-gray-700">{nextBooking.date}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock size={16} className="text-gray-400" />
+                      <span className="text-xs font-bold text-gray-700">{nextBooking.time}</span>
+                    </div>
+                    <div className="flex items-center gap-3 col-span-2">
+                      <MapPin size={16} className="text-gray-400" />
+                      <span className="text-xs font-bold text-gray-700">{nextBooking.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                    <span className="text-[9px] font-bold text-gray-400 block uppercase mb-1">Selected Menu</span>
+                    <p className="text-xs font-bold text-primary-900">{nextBooking.experience}</p>
+                  </div>
+
+                  <div className="flex gap-4 pt-2">
+                    <Button 
+                      className="flex-1 rounded-full bg-primary-900 text-white hover:bg-black text-[10px] font-black tracking-widest uppercase py-4 shadow-lg"
+                      onClick={() => navigate('/dashboard/bookings')}
+                    >
+                      Manage Booking
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="rounded-full border-gray-100 hover:bg-gray-50 text-[10px] font-black tracking-widest uppercase px-6"
+                      onClick={() => navigate('/dashboard/messages')}
+                    >
+                      Message Chef
+                    </Button>
+                  </div>
                 </div>
               </div>
-              <div className="md:w-3/5 p-5 md:p-8 flex flex-col gap-4 md:gap-6 bg-white">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase">Private Chef Experience</span>
-                  <h4 className="text-xl md:text-2xl font-serif text-primary-900">{nextBooking.chefName}</h4>
-                </div>
-
-                <div className="grid grid-cols-2 gap-y-4">
-                  <div className="flex items-center gap-3">
-                    <Calendar size={16} className="text-gray-400" />
-                    <span className="text-xs font-bold text-gray-700">{nextBooking.date}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock size={16} className="text-gray-400" />
-                    <span className="text-xs font-bold text-gray-700">{nextBooking.time}</span>
-                  </div>
-                  <div className="flex items-center gap-3 col-span-2">
-                    <MapPin size={16} className="text-gray-400" />
-                    <span className="text-xs font-bold text-gray-700">{nextBooking.location}</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                  <span className="text-[9px] font-bold text-gray-400 block uppercase mb-1">Selected Menu</span>
-                  <p className="text-xs font-bold text-primary-900">{nextBooking.experience}</p>
-                </div>
-
-                <div className="flex gap-4 pt-2">
-                  <Button 
-                    className="flex-1 rounded-full bg-primary-900 text-white hover:bg-black text-[10px] font-black tracking-widest uppercase py-4 shadow-lg"
-                    onClick={() => navigate('/dashboard/bookings')}
-                  >
-                    Manage Booking
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="rounded-full border-gray-100 hover:bg-gray-50 text-[10px] font-black tracking-widest uppercase px-6"
-                    onClick={() => navigate('/dashboard/messages')}
-                  >
-                    Message Chef
-                  </Button>
-                </div>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden border-transparent shadow-md relative group p-10 flex flex-col items-center justify-center text-center gap-4 bg-gray-50 min-h-[300px]">
+              <Calendar className="w-12 h-12 text-gray-300" />
+              <div>
+                <h4 className="text-lg font-bold text-primary-900">No upcoming experiences</h4>
+                <p className="text-sm text-gray-500">Book a chef to schedule your next private dining experience.</p>
               </div>
-            </div>
-          </Card>
+              <Button className="mt-2 bg-primary-900 text-white rounded-full text-xs font-bold tracking-widest uppercase px-8 py-4 shadow-lg" onClick={() => navigate('/browse-chefs')}>
+                Browse Chefs
+              </Button>
+            </Card>
+          )}
         </div>
 
         {/* Quick Actions / Sidebar in Overview */}
@@ -150,7 +165,7 @@ const DashboardOverview = () => {
                 </div>
                 <span className="text-sm font-bold text-gray-700">Browse New Chefs</span>
               </Button>
-              <Button 
+              {/* <Button 
                 variant="outline" 
                 className="justify-start gap-4 h-16 px-6 border-gray-100 rounded-2xl hover:border-accent group transition-all"
                 onClick={() => navigate('/dashboard/payments')}
@@ -159,7 +174,7 @@ const DashboardOverview = () => {
                   <CreditCard size={18} className="text-primary-900 group-hover:text-accent" />
                 </div>
                 <span className="text-sm font-bold text-gray-700">Payment Methods</span>
-              </Button>
+              </Button> */}
             </div>
           </div>
 

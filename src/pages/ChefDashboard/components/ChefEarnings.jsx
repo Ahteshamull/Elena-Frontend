@@ -19,6 +19,7 @@ import {
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
+import { useGetChefEarningsQuery } from '../../../redux/api/paymentApi';
 
 const ChefEarnings = () => {
   const [isExporting, setIsExporting] = useState(false);
@@ -32,20 +33,60 @@ const ChefEarnings = () => {
     { id: 2, type: 'card', name: 'Visa Debit Card', details: '•••• 4412', isPrimary: false },
   ]);
 
-  const transactions = [
-    { id: 1, type: "Booking Payout", client: "Sarah Johnson", date: "May 20, 2026", status: "Completed", amount: "+$765.00" },
-    { id: 2, type: "Booking Payout", client: "Michael Chen", date: "May 18, 2026", status: "Processing", amount: "+$1,080.00" },
-    { id: 3, type: "Refund Deduction", client: "Cancelled Event", date: "May 15, 2026", status: "Completed", amount: "-$120.00" },
-  ];
+  const { data: earningsData, isLoading } = useGetChefEarningsQuery({});
+  
+  const paymentsList = earningsData?.data?.payments || [];
+  const totalEarnings = earningsData?.data?.totalEarnings || 0;
+  
+  const lastPayoutDate = earningsData?.data?.lastPayoutDate 
+    ? new Date(earningsData.data.lastPayoutDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : 'No payouts yet';
+  const thisMonthEarnings = earningsData?.data?.thisMonthEarnings || 0;
+  const growth = earningsData?.data?.growth || 0;
+
+  const transactions = paymentsList.map(p => ({
+    id: p._id,
+    type: "Booking Payout", 
+    client: p.userId?.name || p.userId?.userName || "Unknown Client",
+    date: new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    status: p.status === 'SUCCESS' ? 'Completed' : p.status === 'HOLD' ? 'Escrow' : 'Processing',
+    amount: `+$${(p.influencer_amount || p.amount || 0).toFixed(2)}`
+  }));
 
   const handleExport = () => {
     setIsExporting(true);
-    // Simulate generation & download
-    setTimeout(() => {
+    
+    try {
+      if (transactions.length === 0) {
+        alert("No transactions to export");
+        setIsExporting(false);
+        return;
+      }
+
+      let csvContent = "Transaction Type,Client,Date,Status,Amount\\n";
+      
+      transactions.forEach(row => {
+        const client = `"${row.client.replace(/"/g, '""')}"`;
+        const amount = `"${row.amount}"`;
+        csvContent += `"${row.type}",${client},"${row.date}","${row.status}",${amount}\\n`;
+      });
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Elena_Chef_Earnings_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
       setIsExporting(false);
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
-    }, 2000);
+    } catch (error) {
+      console.error("Failed to generate report", error);
+      setIsExporting(false);
+    }
   };
 
   const handleAddMethod = () => {
@@ -209,7 +250,7 @@ const ChefEarnings = () => {
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
                 <span className="text-accent text-xs font-black uppercase tracking-widest">Available Balance</span>
-                <h2 className="text-3xl md:text-5xl font-bold !text-white">$3,420.50</h2>
+                <h2 className="text-3xl md:text-5xl font-bold !text-white">${totalEarnings.toLocaleString('en-US', { minimumFractionDigits: 2 })}</h2>
               </div>
               <div className="w-16 h-16 rounded-[24px] bg-white/10 flex items-center justify-center backdrop-blur-md">
                 <Wallet size={32} className="text-accent" />
@@ -219,15 +260,17 @@ const ChefEarnings = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-6 border-t border-white/10">
               <div className="flex flex-col gap-1">
                 <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Last Payout</span>
-                <span className="text-xl font-bold !text-white">May 14, 2026</span>
+                <span className="text-xl font-bold !text-white">{lastPayoutDate}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">This Month</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold !text-white">$1,240</span>
-                  <div className="flex items-center gap-1 text-green-400 text-[10px] font-bold">
-                    <TrendingUp size={10} /> +12%
-                  </div>
+                  <span className="text-xl font-bold !text-white">${thisMonthEarnings.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+                  {growth !== 0 && (
+                    <div className={`flex items-center gap-1 text-[10px] font-bold ${growth > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                      <TrendingUp size={10} className={growth < 0 ? 'rotate-180' : ''} /> {growth > 0 ? '+' : ''}{growth}%
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="hidden md:flex flex-col gap-1">
@@ -260,7 +303,7 @@ const ChefEarnings = () => {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Platform Fee</span>
-                    <span className="text-sm font-bold text-primary-900">12%</span>
+                    <span className="text-sm font-bold text-primary-900">20%</span>
                   </div>
                 </div>
                 <Badge variant="outline" className="text-[8px] font-black uppercase border-gray-200">Standard</Badge>
@@ -290,7 +333,11 @@ const ChefEarnings = () => {
 
         {/* Mobile: Card view */}
         <div className="md:hidden flex flex-col gap-3">
-          {transactions.map((t) => (
+          {isLoading ? (
+            <div className="p-8 text-center text-gray-400">Loading transactions...</div>
+          ) : transactions.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">No transactions yet</div>
+          ) : transactions.map((t) => (
             <div key={t.id} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center justify-between gap-3">
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-sm font-bold text-primary-900">{t.type}</span>
@@ -319,7 +366,15 @@ const ChefEarnings = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {transactions.map((t) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="4" className="px-8 py-10 text-center text-gray-400 font-medium">Loading transactions...</td>
+                </tr>
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="px-8 py-10 text-center text-gray-400 font-medium">No transactions yet</td>
+                </tr>
+              ) : transactions.map((t) => (
                 <tr key={t.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-8 py-6">
                     <div className="flex flex-col gap-1">

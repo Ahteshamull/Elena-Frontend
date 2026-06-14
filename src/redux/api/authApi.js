@@ -18,8 +18,8 @@ export const authApi = apiSlice.injectEndpoints({
     }),
     verifyRegistration: builder.mutation({
       query: (verifyData) => ({
-        url: 'auth/verify-registration',
-        method: 'POST',
+        url: "auth/verify-registration",
+        method: "POST",
         body: verifyData,
       }),
     }),
@@ -59,7 +59,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: "/auth/current-user-login",
         method: "POST",
       }),
-      providesTags: ['User']
+      providesTags: ["User"],
     }),
     deleteMyAccount: builder.mutation({
       query: () => ({
@@ -67,17 +67,25 @@ export const authApi = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { 
-  useLoginMutation, 
-  useCreateUserMutation, 
+export const {
+  useLoginMutation,
+  useCreateUserMutation,
   useVerifyRegistrationMutation,
   useForgotPasswordMutation,
   useVerifyResetOtpMutation,
   useResetPasswordMutation,
   useResendOtpMutation,
   useGetCurrentUserQuery,
-  useDeleteMyAccountMutation
+  useDeleteMyAccountMutation,
+  useChangePasswordMutation,
 } = authApi;

@@ -26,8 +26,45 @@ import { Badge } from '../../../components/ui/Badge';
 import { cn } from '../../../utils/cn';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useGetCurrentUserQuery, useDeleteMyAccountMutation } from '../../../redux/api/authApi';
+import { useGetCurrentUserQuery, useDeleteMyAccountMutation, useChangePasswordMutation } from '../../../redux/api/authApi';
 import { useUpdateUserProfileMutation } from '../../../redux/api/userApi';
+
+const ModalOverlay = ({ title, description, children, onClose, onConfirm, confirmText, variant = "primary" }) => (
+  <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-300">
+    <div className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm" onClick={onClose} />
+    <Card className="relative w-full max-w-lg bg-white p-6 md:p-8 rounded-t-[40px] md:rounded-[40px] shadow-2xl border-transparent animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
+      <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400">
+        <X size={20} />
+      </button>
+
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <h3 className="text-2xl font-serif text-primary-900 italic">{title}</h3>
+          <p className="text-sm text-gray-500 font-medium">{description}</p>
+        </div>
+
+        <div className="py-4">
+          {children}
+        </div>
+
+        <div className="flex items-center gap-3 pt-4">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest border-gray-100">Cancel</Button>
+          <Button 
+            onClick={onConfirm}
+            className={cn(
+              "flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest shadow-xl",
+              variant === "danger" 
+                ? "bg-red-600 text-white hover:bg-red-700 shadow-red-200" 
+                : "bg-primary-900 text-white hover:bg-black shadow-gray-200"
+            )}
+          >
+            {confirmText}
+          </Button>
+        </div>
+      </div>
+    </Card>
+  </div>
+);
 
 const Profile = () => {
   const { data: userRes, isLoading } = useGetCurrentUserQuery();
@@ -62,6 +99,9 @@ const Profile = () => {
 
   const [activeModal, setActiveModal] = React.useState(null); // 'password', 'notifications', 'deactivate'
   const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const [passwords, setPasswords] = React.useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
 
   const [addresses, setAddresses] = React.useState([
     { id: 1, label: 'Home', address: 'Loading...', icon: Home, isEditing: false }
@@ -172,42 +212,27 @@ const Profile = () => {
     }
   };
 
-  // --- Components ---
+  const handlePasswordChange = async () => {
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    try {
+      const res = await changePassword({ 
+        currentPassword: passwords.currentPassword, 
+        newPassword: passwords.newPassword,
+        confirmPassword: passwords.confirmPassword
+      }).unwrap();
+      setActiveModal(null);
+      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      toast.success(res.message || "Password changed successfully");
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      toast.error(error?.data?.message || "Failed to change password");
+    }
+  };
 
-  const ModalOverlay = ({ title, description, children, onClose, onConfirm, confirmText, variant = "primary" }) => (
-    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-300">
-      <div className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm" onClick={onClose} />
-      <Card className="relative w-full max-w-lg bg-white p-6 md:p-8 rounded-t-[40px] md:rounded-[40px] shadow-2xl border-transparent animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400">
-          <X size={20} />
-        </button>
-
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <h3 className="text-2xl font-serif text-primary-900 italic">{title}</h3>
-            <p className="text-sm text-gray-500 font-medium">{description}</p>
-          </div>
-
-          <div className="py-4">
-            {children}
-          </div>
-
-          <div className="flex items-center gap-3 pt-4">
-            <Button variant="outline" onClick={onClose} className="flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest border-gray-100">Cancel</Button>
-            <Button 
-              onClick={onConfirm}
-              className={cn(
-                "flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest shadow-xl",
-                variant === "danger" ? "bg-red-600 hover:bg-red-700 text-white" : "bg-primary-900 hover:bg-black text-white"
-              )}
-            >
-              {isSuccess ? <CheckCircle2 size={18} /> : confirmText}
-            </Button>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
+  // --- Render ---
 
   return (
     <div className="relative flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
@@ -283,111 +308,6 @@ const Profile = () => {
                     onChange={(e) => setLanguages(e.target.value)}
                     placeholder="e.g. English, French"
                     className="h-14 bg-gray-50 border-transparent rounded-2xl px-6" 
-                  />
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Section: Dining Preferences */}
-          <Card className="p-8 border-transparent bg-white shadow-sm rounded-[32px]">
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
-                  <Heart size={20} />
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="text-xl font-bold text-primary-900">Dining Profile</h3>
-                  <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Personalize your culinary experiences</p>
-                </div>
-              </div>
-
-              <div className="grid gap-8">
-                {/* Dietary Restrictions */}
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle size={14} className="text-red-500" />
-                    <span className="text-xs font-bold text-primary-900">Dietary Restrictions & Allergies</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {dietary.map((tag) => (
-                      <Badge key={tag} className="bg-red-50 text-red-600 border-none px-4 py-2 rounded-full font-bold text-[9px] tracking-widest uppercase flex items-center gap-2 group">
-                        {tag} 
-                        <Plus 
-                          size={10} 
-                          className="rotate-45 cursor-pointer hover:scale-125 transition-transform" 
-                          onClick={() => handleRemoveTag('dietary', tag)}
-                        />
-                      </Badge>
-                    ))}
-                    {isAddingDietary ? (
-                      <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
-                        <Input 
-                          autoFocus
-                          placeholder="e.g. Gluten-Free"
-                          className="h-8 w-32 text-[10px] px-3 rounded-full bg-gray-50"
-                          value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddTag('dietary')}
-                        />
-                        <button onClick={() => handleAddTag('dietary')} className="text-accent hover:text-primary-900 transition-colors"><Plus size={16} /></button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setIsAddingDietary(true)}
-                        className="px-4 py-2 rounded-full border border-dashed border-gray-200 text-[9px] font-black text-gray-400 uppercase tracking-widest hover:border-accent hover:text-accent transition-all"
-                      >
-                        + Add New
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Preferred Cuisines */}
-                <div className="flex flex-col gap-4">
-                  <span className="text-xs font-bold text-primary-900">Preferred Cuisines</span>
-                  <div className="flex flex-wrap gap-2">
-                    {cuisines.map((tag) => (
-                      <Badge key={tag} className="bg-primary-50 text-primary-900 border-none px-4 py-2 rounded-full font-bold text-[9px] tracking-widest uppercase flex items-center gap-2 group">
-                        {tag} 
-                        <Plus 
-                          size={10} 
-                          className="rotate-45 cursor-pointer hover:scale-125 transition-transform" 
-                          onClick={() => handleRemoveTag('cuisines', tag)}
-                        />
-                      </Badge>
-                    ))}
-                    {isAddingCuisine ? (
-                      <div className="flex items-center gap-2 animate-in fade-in zoom-in-95 duration-200">
-                        <Input 
-                          autoFocus
-                          placeholder="e.g. Thai"
-                          className="h-8 w-32 text-[10px] px-3 rounded-full bg-gray-50"
-                          value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddTag('cuisines')}
-                        />
-                        <button onClick={() => handleAddTag('cuisines')} className="text-accent hover:text-primary-900 transition-colors"><Plus size={16} /></button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setIsAddingCuisine(true)}
-                        className="px-4 py-2 rounded-full border border-dashed border-gray-200 text-[9px] font-black text-gray-400 uppercase tracking-widest hover:border-accent hover:text-accent transition-all"
-                      >
-                        + Add Cuisine
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Kitchen Equipment Notes */}
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">About Me & Special Notes</label>
-                  <textarea 
-                    value={aboutMe}
-                    onChange={(e) => setAboutMe(e.target.value)}
-                    placeholder="e.g. Professional convection oven available, Induction cooktop..."
-                    className="w-full p-6 bg-gray-50 border-transparent rounded-2xl text-sm min-h-[100px] focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                 </div>
               </div>
@@ -530,22 +450,40 @@ const Profile = () => {
         <ModalOverlay
           title="Change Password"
           description="Protect your account with a secure, unique password."
-          confirmText="Update Password"
+          confirmText={isChangingPassword ? "Updating..." : "Update Password"}
           onClose={() => setActiveModal(null)}
-          onConfirm={triggerSuccess}
+          onConfirm={handlePasswordChange}
         >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Current Password</label>
-              <Input type="password" placeholder="••••••••" className="h-12 bg-gray-50 border-transparent rounded-xl" />
+              <Input 
+                type="password" 
+                placeholder="••••••••" 
+                value={passwords.currentPassword}
+                onChange={(e) => setPasswords({...passwords, currentPassword: e.target.value})}
+                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+              />
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Password</label>
-              <Input type="password" placeholder="••••••••" className="h-12 bg-gray-50 border-transparent rounded-xl" />
+              <Input 
+                type="password" 
+                placeholder="••••••••" 
+                value={passwords.newPassword}
+                onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
+                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+              />
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Confirm New Password</label>
-              <Input type="password" placeholder="••••••••" className="h-12 bg-gray-50 border-transparent rounded-xl" />
+              <Input 
+                type="password" 
+                placeholder="••••••••" 
+                value={passwords.confirmPassword}
+                onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
+                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+              />
             </div>
           </div>
         </ModalOverlay>

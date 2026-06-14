@@ -21,9 +21,9 @@ export default function DualCTA() {
             <p className="text-gray-500 mb-8 max-w-[280px] mx-auto text-sm leading-relaxed">
               Access the world's most talented private chefs for your next occasion.
             </p>
-            <Button variant="primary" className="rounded-none px-8 py-3 w-full max-w-[240px] text-[10px] font-bold tracking-widest uppercase">
+            {/* <Button variant="primary" className="rounded-none px-8 py-3 w-full max-w-[240px] text-[10px] font-bold tracking-widest uppercase">
               Inquire Now
-            </Button>
+            </Button> */}
           </div>
 
           {/* Card 2 */}
@@ -31,9 +31,9 @@ export default function DualCTA() {
             <p className="text-gray-500 mb-8 max-w-[320px] mx-auto text-sm leading-relaxed mt-4">
               Join our elite network of verified chefs and reach high-net-worth clients.
             </p>
-            <Button variant="outline" className="rounded-none px-8 py-3 w-full max-w-[240px] text-[10px] font-bold tracking-widest uppercase !border-black text-black hover:!bg-black hover:!text-white">
+            {/* <Button variant="outline" className="rounded-none px-8 py-3 w-full max-w-[240px] text-[10px] font-bold tracking-widest uppercase !border-black text-black hover:!bg-black hover:!text-white">
               Join the Inner Circle
-            </Button>
+            </Button> */}
           </div>
 
         </div>

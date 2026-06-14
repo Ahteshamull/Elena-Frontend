@@ -17,38 +17,33 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { useNavigate } from 'react-router-dom';
+import { useGetChefDashboardQuery } from '../../../redux/api/dashboardApi';
+import { Loader2 } from 'lucide-react';
 
 const ChefOverview = () => {
   const navigate = useNavigate();
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      clientName: "Eleanor Shellstrop",
-      event: "Birthday Dinner (8 Guests)",
-      date: "June 02, 2026",
-      location: "Beverly Hills, CA",
-      amount: "$850",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
-    },
-    {
-      id: 2,
-      clientName: "Tahani Al-Jamil",
-      event: "Anniversary Brunch (4 Guests)",
-      date: "June 05, 2026",
-      location: "Bel Air, CA",
-      amount: "$420",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const { data: dashboardRes, isLoading, refetch } = useGetChefDashboardQuery();
+  const dashboardData = dashboardRes?.data || {
+    requests: [],
+    statsData: { activeBookings: 0, totalEarnings: "$0", rating: "0.0" },
+    recentReviews: [],
+    upcomingPayout: "$0.00"
+  };
+
+  // Local state to allow optimistic updates when accepting/declining
+  const [requests, setRequests] = useState([]);
+  const [statsData, setStatsData] = useState(dashboardData.statsData);
+
+  React.useEffect(() => {
+    if (dashboardRes?.data) {
+      setRequests(dashboardRes.data.requests || []);
+      setStatsData(dashboardRes.data.statsData || { activeBookings: 0, totalEarnings: "$0", rating: "0.0" });
     }
-  ]);
-
-  const [statsData, setStatsData] = useState({
-    activeBookings: 8,
-    totalEarnings: "$4,250",
-    rating: "4.9"
-  });
-
+  }, [dashboardRes]);
   const handleAccept = (id) => {
     // In a real app, this would be an API call
+    // For now we'll optimistically update
     setRequests(prev => prev.filter(req => req.id !== id));
     setStatsData(prev => ({
       ...prev,
@@ -57,8 +52,13 @@ const ChefOverview = () => {
   };
 
   const handleDecline = (id) => {
+    // Optimistic update
     setRequests(prev => prev.filter(req => req.id !== id));
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-[400px]"><Loader2 size={32} className="animate-spin text-accent" /></div>;
+  }
 
   const stats = [
     { label: "New Requests", value: requests.length.toString(), icon: Clock, color: "bg-blue-50 text-blue-600" },
@@ -74,8 +74,8 @@ const ChefOverview = () => {
         <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">Chef's Console</h1>
         <p className="text-gray-500 font-medium text-sm md:text-base">
           {requests.length > 0
-            ? `Welcome back, Chef Julian. You have ${requests.length} new requests waiting for your approval.`
-            : "Welcome back, Chef Julian. Your schedule is up to date."}
+            ? `Welcome back, ${user?.userName || 'Chef'}. You have ${requests.length} new requests waiting for your approval.`
+            : `Welcome back, ${user?.userName || 'Chef'}. Your schedule is up to date.`}
         </p>
       </div>
 
@@ -173,8 +173,8 @@ const ChefOverview = () => {
                 <h4 className="text-2xl font-serif italic">Upcoming Payout</h4>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-3xl font-bold text-white">$1,840.00</span>
-                <span className="text-white/60 text-xs font-medium">Scheduled for May 28, 2026</span>
+                <span className="text-3xl font-bold text-white">{dashboardData.upcomingPayout || "$0.00"}</span>
+                <span className="text-white/60 text-xs font-medium">Scheduled for soon</span>
               </div>
               <Button
                 onClick={() => navigate('/chef-dashboard/earnings')}
@@ -193,21 +193,24 @@ const ChefOverview = () => {
           <Card className="p-8 border-gray-100 bg-white rounded-[32px] flex flex-col gap-6">
             <h4 className="text-sm font-bold text-primary-900 uppercase tracking-widest">Recent Reviews</h4>
             <div className="flex flex-col gap-5">
-              {[1, 2].map((i) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} size={10} className="fill-accent text-accent" />
-                      ))}
+              {dashboardData.recentReviews && dashboardData.recentReviews.length > 0 ? (
+                dashboardData.recentReviews.map((review) => (
+                  <div key={review.id} className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <Star key={idx} size={10} className={idx < review.rating ? "fill-accent text-accent" : "fill-gray-200 text-gray-200"} />
+                        ))}
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{review.timeAgo}</span>
                     </div>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">2 days ago</span>
+                    <p className="text-[11px] text-gray-600 leading-relaxed italic">"{review.comment}"</p>
+                    <span className="text-[9px] font-bold text-primary-900 uppercase">- {review.reviewerName}</span>
                   </div>
-                  <p className="text-[11px] text-gray-600 leading-relaxed italic">"Chef Julian created an unforgettable dining experience. The duck breast was cooked to perfection!"</p>
-                </div>
-
-
-              ))}
+                ))
+              ) : (
+                <p className="text-xs text-gray-400 italic">No recent reviews.</p>
+              )}
             </div>
           </Card>
         </div>

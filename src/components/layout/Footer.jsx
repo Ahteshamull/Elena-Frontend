@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Mail, MapPin } from "lucide-react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 
 export default function Footer() {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        setLoggedInUser(JSON.parse(userStr));
-      } catch (e) {
-        // ignore error
+    const checkAuth = () => {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          setLoggedInUser(JSON.parse(userStr));
+        } catch (e) {
+          // ignore error
+        }
+      } else {
+        setLoggedInUser(null);
       }
-    }
-  }, []);
+    };
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
+  }, [location.pathname]);
 
   return (
     <footer

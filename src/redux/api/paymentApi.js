@@ -14,7 +14,20 @@ export const paymentApi = apiSlice.injectEndpoints({
         method: 'GET',
       }),
     }),
+    getChefEarnings: builder.query({
+      query: (params) => ({
+        url: `/payment/chef-earnings`,
+        method: 'GET',
+        params,
+      }),
+    }),
+    stripeAccountOnboarding: builder.mutation({
+      query: () => ({
+        url: '/payment/stripe-account-onboarding',
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
-export const { useCreateCheckoutSessionMutation, useVerifyPaymentQuery } = paymentApi;
+export const { useCreateCheckoutSessionMutation, useVerifyPaymentQuery, useGetChefEarningsQuery, useStripeAccountOnboardingMutation } = paymentApi;

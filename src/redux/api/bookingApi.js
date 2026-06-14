@@ -15,7 +15,11 @@ export const bookingApi = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Booking', id }],
     }),
     getClientBookings: builder.query({
-      query: () => `/booking/client`,
+      query: (status) => (status ? `/booking/client/${status}` : `/booking/client`),
+      providesTags: ['Booking'],
+    }),
+    getChefBookings: builder.query({
+      query: (status) => (status ? `/booking/chef/${status}` : `/booking/chef`),
       providesTags: ['Booking'],
     }),
     updateBookingStatus: builder.mutation({
@@ -26,7 +30,22 @@ export const bookingApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Booking'],
     }),
+    updateBookingDetails: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/booking/${id}/update-details`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    cancelBooking: builder.mutation({
+      query: (id) => ({
+        url: `/booking/${id}/cancel`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Booking'],
+    }),
   }),
 });
 
-export const { useCreateBookingMutation, useGetBookingDetailsQuery, useGetClientBookingsQuery, useUpdateBookingStatusMutation } = bookingApi;
+export const { useCreateBookingMutation, useGetBookingDetailsQuery, useGetClientBookingsQuery, useGetChefBookingsQuery, useUpdateBookingStatusMutation, useUpdateBookingDetailsMutation, useCancelBookingMutation } = bookingApi;

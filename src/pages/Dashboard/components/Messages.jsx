@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Search, 
   Send, 
@@ -27,8 +28,10 @@ import { useGetConversationsQuery, useGetMessagesQuery } from '../../../redux/ap
 export default function Messages() {
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
   const { socket, isConnected } = useSocket();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeConvId, setActiveConvId] = useState(null);
+  const initialConvId = searchParams.get('convId');
+  const [activeConvId, setActiveConvId] = useState(initialConvId || null);
   const [inputText, setInputText] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [localMessages, setLocalMessages] = useState([]);
@@ -46,10 +49,16 @@ export default function Messages() {
   const { data: convData, refetch: refetchConvs } = useGetConversationsQuery();
   const conversations = convData?.data || [];
 
-  const { data: msgData, isLoading: isLoadingMsgs } = useGetMessagesQuery(
+  const { data: msgData, isLoading: isLoadingMsgs, refetch: refetchMsgs } = useGetMessagesQuery(
     { conversationId: activeConvId },
-    { skip: !activeConvId }
+    { skip: !activeConvId, refetchOnMountOrArgChange: true }
   );
+
+  useEffect(() => {
+    if (activeConvId) {
+      refetchMsgs();
+    }
+  }, [activeConvId, refetchMsgs]);
 
   useEffect(() => {
     if (msgData?.data) {
@@ -69,8 +78,13 @@ export default function Messages() {
   useEffect(() => {
     if (activeConvId) {
       scrollToBottom('smooth');
+      // Clean up the URL when selecting a chat
+      if (searchParams.has('convId')) {
+        searchParams.delete('convId');
+        setSearchParams(searchParams, { replace: true });
+      }
     }
-  }, [localMessages, isTyping]);
+  }, [localMessages, isTyping, activeConvId]);
 
   useEffect(() => {
     if (!socket) return;
@@ -134,7 +148,8 @@ export default function Messages() {
     const conv = conversations.find(c => c._id === activeConvId);
     if (!conv) return;
 
-    const receiverId = conv.participants.find(p => p._id !== currentUser?._id)?._id;
+    const currentUserId = String(currentUser?._id || currentUser?.id || "");
+    const receiverId = conv.participants.find(p => String(p._id || p.id) !== currentUserId)?._id || conv.participants.find(p => String(p._id || p.id) !== currentUserId)?.id;
 
     socket.emit("single-chat-send-message", {
       receiverId,
@@ -188,8 +203,8 @@ export default function Messages() {
       status: "online",
       unread: unreadCount,
       lastMsg: conv.lastMessage?.text || "No messages yet",
-      time: new Date(conv.lastMessageAt || conv.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      timestamp: new Date(conv.lastMessageAt || conv.createdAt).getTime()
+      time: new Date(conv.lastMessage?.createdAt || conv.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date(conv.lastMessage?.createdAt || conv.createdAt).getTime()
     };
   }).sort((a, b) => b.timestamp - a.timestamp);
 
@@ -336,8 +351,9 @@ export default function Messages() {
               </div>
             ) : (
               localMessages.map((msg) => {
-                const currentUserId = currentUser?._id || currentUser?.id;
-                const isMe = msg.senderId?._id === currentUserId || msg.senderId === currentUserId;
+                const currentUserId = String(currentUser?._id || currentUser?.id || "");
+                const msgSenderId = String(msg.senderId?._id || msg.senderId?.id || msg.senderId || "");
+                const isMe = msgSenderId === currentUserId;
                 
                 return (
                   <div 

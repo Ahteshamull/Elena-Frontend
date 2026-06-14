@@ -18,7 +18,20 @@ export const chatApi = apiSlice.injectEndpoints({
         { type: 'Message', id: conversationId },
       ],
     }),
+    createConversation: builder.mutation({
+      query: (receiverId) => ({
+        url: '/conversations',
+        method: 'POST',
+        body: { receiverId },
+      }),
+      invalidatesTags: ['Conversation'],
+    }),
   }),
 });
 
-export const { useGetConversationsQuery, useGetMessagesQuery, useLazyGetMessagesQuery } = chatApi;
+export const { 
+  useGetConversationsQuery, 
+  useGetMessagesQuery,
+  useLazyGetMessagesQuery,
+  useCreateConversationMutation
+} = chatApi;

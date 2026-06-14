@@ -27,6 +27,21 @@ const menuItems = [
 export const AdminSidebar = () => {
   const location = useLocation();
 
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    // Clear Cookies
+    document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
+    document.cookie = "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
+    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
+
+    // Redirect to home
+    window.location.href = "/";
+  };
+
   return (
     <aside className="w-64 hidden md:flex flex-col bg-white border-r border-gray-100 min-h-[calc(100vh-80px)] sticky top-20">
       <div className="px-6 py-6 border-b border-gray-50">
@@ -63,7 +78,7 @@ export const AdminSidebar = () => {
       </div>
 
       <div className="p-4 border-t border-gray-50">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-xl group">
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-xl group">
           <LogOut size={18} className="group-hover:text-red-500" />
           <span className="text-sm font-bold">Log Out</span>
         </button>

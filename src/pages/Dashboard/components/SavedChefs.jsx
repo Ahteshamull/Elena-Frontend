@@ -49,9 +49,9 @@ const SavedChefs = () => {
           </div>
         ) : (
           savedChefs.map((fav) => {
-            const chefUser = fav.favoritedUserId || {};
+            const chefUser = fav || {};
             const profile = chefUser.profile || {};
-            const chefId = chefUser._id;
+            const chefId = chefUser._id || chefUser.id;
             
             const name = profile.fullName || profile.displayName || chefUser.userName || "Verified Chef";
             const specialty = profile.cuisineSpecialties?.[0] || profile.chefCategory?.[0] || "Executive Chef";

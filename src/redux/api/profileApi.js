@@ -10,6 +10,10 @@ export const profileApi = apiSlice.injectEndpoints({
         body: formData,
       }),
     }),
+    getMyProfile: builder.query({
+      query: () => '/profile/me',
+      providesTags: ['User'],
+    }),
     getProfileByUserId: builder.query({
       query: (id) => `/profile/user/${id}`,
     }),
@@ -24,4 +28,4 @@ export const profileApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useSetupProfileMutation, useGetProfileByUserIdQuery, useUpdateProfileMutation } = profileApi;
+export const { useSetupProfileMutation, useGetMyProfileQuery, useGetProfileByUserIdQuery, useUpdateProfileMutation } = profileApi;

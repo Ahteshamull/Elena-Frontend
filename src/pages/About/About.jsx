@@ -1,12 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Target, Eye, Lock, SlidersHorizontal, ChefHat, Home } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 export default function About() {
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        setLoggedInUser(JSON.parse(userStr));
+      } catch (e) {
+        // ignore error
+      }
+    }
   }, []);
 
   return (
@@ -268,12 +278,13 @@ export default function About() {
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full sm:w-auto">
-              <Link to="/browse-chefs" className="w-full sm:w-auto">
-                <Button variant="secondary" className="w-full sm:w-auto rounded-full px-8 py-3.5 text-sm h-auto bg-[#FDE047] text-black hover:bg-[#FDE047]/90 font-medium border-none shadow-none">
-                  Browse Our Chefs
-                </Button>
-              </Link>
-            
+              {loggedInUser?.role !== "chef" && (
+                <Link to="/browse-chefs" className="w-full sm:w-auto">
+                  <Button variant="secondary" className="w-full sm:w-auto rounded-full px-8 py-3.5 text-sm h-auto bg-[#FDE047] text-black hover:bg-[#FDE047]/90 font-medium border-none shadow-none">
+                    Browse Our Chefs
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

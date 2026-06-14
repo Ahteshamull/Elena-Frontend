@@ -24,79 +24,82 @@ import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { Input } from '../../../components/ui/Input';
 
+import {
+  useGetMyMenusQuery,
+  useCreateMenuMutation,
+  useUpdateMenuMutation,
+  useDeleteMenuMutation
+} from '../../../redux/api/menuApi';
+
 const ChefMenus = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
 
-  const [menus, setMenus] = useState([
-    {
-      id: 1,
-      title: "French Riviera Night",
-      category: "Fine Dining",
-      price: "$145 / person",
-      courses: 5,
-      image: "https://images.unsplash.com/photo-1550966841-3ee4ad6b105a?auto=format&fit=crop&q=80&w=400",
-      isPopular: true,
-      status: "Active"
-    },
-    {
-      id: 2,
-      title: "Rustic Italian Feast",
-      category: "Casual Dining",
-      price: "$95 / person",
-      courses: 3,
-      image: "https://images.unsplash.com/photo-1498579150354-977475b7ea0b?auto=format&fit=crop&q=80&w=400",
-      isPopular: false,
-      status: "Active"
-    },
-    {
-      id: 3,
-      title: "Mediterranean Zen",
-      category: "Vegan / Health",
-      price: "$120 / person",
-      courses: 4,
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400",
-      isPopular: false,
-      status: "Draft"
-    }
-  ]);
+  const { data: menusRes, isLoading } = useGetMyMenusQuery();
+  const [createMenu, { isLoading: isCreatingMenu }] = useCreateMenuMutation();
+  const [updateMenu, { isLoading: isUpdatingMenu }] = useUpdateMenuMutation();
+  const [deleteMenu] = useDeleteMenuMutation();
+
+  const menusData = menusRes?.data || [];
 
   const filteredMenus = useMemo(() => {
-    return menus.filter(menu =>
-      menu.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      menu.category.toLowerCase().includes(searchTerm.toLowerCase())
+    return menusData.filter(menu =>
+      menu.menuTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      menu.menuCategory?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [menus, searchTerm]);
+  }, [menusData, searchTerm]);
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this menu?")) {
-      setMenus(prev => prev.filter(m => m.id !== id));
+      try {
+        await deleteMenu(id).unwrap();
+      } catch (err) {
+        console.error("Failed to delete menu", err);
+      }
     }
-  };
-
-  const handleToggleStatus = (id) => {
-    setMenus(prev => prev.map(m =>
-      m.id === id ? { ...m, status: m.status === 'Active' ? 'Draft' : 'Active' } : m
-    ));
   };
 
   const handleEdit = (menu) => {
-    setEditingMenu({ ...menu });
+    setEditingMenu({ 
+      id: menu._id, 
+      title: menu.menuTitle, 
+      category: menu.menuCategory, 
+      courses: menu.numberOfCourse,
+      imagePreview: menu.menuImage?.startsWith('http') ? menu.menuImage : `http://localhost:8005${menu.menuImage}`,
+      imageFile: null
+    });
     setIsEditing(true);
     setIsCreating(false);
   };
 
-  const handleSave = () => {
-    if (isCreating) {
-      setMenus(prev => [...prev, { ...editingMenu, id: Date.now() }]);
-    } else {
-      setMenus(prev => prev.map(m => m.id === editingMenu.id ? editingMenu : m));
+  const handleSave = async () => {
+    const formData = new FormData();
+    formData.append('menuTitle', editingMenu.title);
+    formData.append('menuCategory', editingMenu.category);
+    formData.append('numberOfCourse', editingMenu.courses);
+    
+    if (editingMenu.imageFile) {
+      formData.append('menuImage', editingMenu.imageFile);
     }
-    setIsEditing(false);
-    setIsCreating(false);
-    setEditingMenu(null);
+
+    try {
+      if (isCreating) {
+        if (!editingMenu.imageFile) {
+          alert('Menu image is required');
+          return;
+        }
+        await createMenu(formData).unwrap();
+      } else {
+        await updateMenu({ id: editingMenu.id, formData }).unwrap();
+      }
+      setIsEditing(false);
+      setIsCreating(false);
+      setEditingMenu(null);
+    } catch (err) {
+      console.error("Failed to save menu", err);
+    }
   };
 
   const handleCreate = () => {
@@ -104,11 +107,9 @@ const ChefMenus = () => {
       id: null,
       title: "",
       category: "",
-      price: "",
       courses: 1,
-      image: "",
-      isPopular: false,
-      status: "Draft"
+      imagePreview: "",
+      imageFile: null
     });
     setIsCreating(true);
     setIsEditing(true);
@@ -121,25 +122,6 @@ const ChefMenus = () => {
   };
 
   const [activeDropdown, setActiveDropdown] = useState(null);
-
-  const handleTogglePopular = (id) => {
-    setMenus(prev => prev.map(m =>
-      m.id === id ? { ...m, isPopular: !m.isPopular } : m
-    ));
-    setActiveDropdown(null);
-  };
-
-  const handleDuplicate = (menu) => {
-    const newMenu = {
-      ...menu,
-      id: Date.now(),
-      title: `${menu.title} (Copy)`,
-      isPopular: false,
-      status: "Draft"
-    };
-    setMenus(prev => [...prev, newMenu]);
-    setActiveDropdown(null);
-  };
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative" onClick={() => setActiveDropdown(null)}>
@@ -170,25 +152,14 @@ const ChefMenus = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-3">
-                    <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Category</label>
-                    <Input
-                      value={editingMenu.category}
-                      onChange={(e) => setEditingMenu({ ...editingMenu, category: e.target.value })}
-                      placeholder="e.g. Fine Dining"
-                      className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Price</label>
-                    <Input
-                      value={editingMenu.price}
-                      onChange={(e) => setEditingMenu({ ...editingMenu, price: e.target.value })}
-                      placeholder="e.g. $145 / person"
-                      className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
-                    />
-                  </div>
+                <div className="flex flex-col gap-3">
+                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Category</label>
+                  <Input
+                    value={editingMenu.category}
+                    onChange={(e) => setEditingMenu({ ...editingMenu, category: e.target.value })}
+                    placeholder="e.g. Fine Dining"
+                    className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
+                  />
                 </div>
 
                 <div className="flex flex-col gap-3">
@@ -207,9 +178,9 @@ const ChefMenus = () => {
                     className="relative group/upload h-48 rounded-[32px] border-2 border-dashed border-gray-100 bg-gray-50 flex flex-col items-center justify-center gap-3 overflow-hidden hover:border-accent hover:bg-accent/5 transition-all cursor-pointer"
                     onClick={() => document.getElementById('menu-image-upload').click()}
                   >
-                    {editingMenu.image ? (
+                    {editingMenu.imagePreview ? (
                       <>
-                        <img src={editingMenu.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover/upload:opacity-20 transition-opacity" />
+                        <img src={editingMenu.imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover/upload:opacity-20 transition-opacity" />
                         <div className="relative z-10 flex flex-col items-center gap-2">
                           <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-center text-primary-900">
                             <ImageIcon size={20} />
@@ -238,38 +209,13 @@ const ChefMenus = () => {
                         if (file) {
                           const reader = new FileReader();
                           reader.onloadend = () => {
-                            setEditingMenu({ ...editingMenu, image: reader.result });
+                            setEditingMenu({ ...editingMenu, imagePreview: reader.result, imageFile: file });
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
                     />
                   </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Menu Status</label>
-                  <div className="flex p-1 bg-gray-50 rounded-2xl">
-                    <button
-                      onClick={() => setEditingMenu({ ...editingMenu, status: 'Active' })}
-                      className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${editingMenu.status === 'Active' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full ${editingMenu.status === 'Active' ? 'bg-green-600 animate-pulse' : 'bg-gray-300'}`} />
-                        Active / Published
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => setEditingMenu({ ...editingMenu, status: 'Draft' })}
-                      className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${editingMenu.status === 'Draft' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full ${editingMenu.status === 'Draft' ? 'bg-gray-900' : 'bg-gray-300'}`} />
-                        Draft / Hidden
-                      </div>
-                    </button>
-                  </div>
-                  <p className="text-[10px] text-gray-400 font-medium px-2">Active menus are visible to all clients in the marketplace.</p>
                 </div>
 
                 <div className="p-6 bg-accent/5 rounded-3xl border border-accent/10 flex items-start gap-4 mt-4">
@@ -284,8 +230,8 @@ const ChefMenus = () => {
 
                 <div className="flex gap-4 pt-6">
                   <Button variant="outline" onClick={handleCancel} className="flex-1 h-14 rounded-full text-[10px] font-black uppercase tracking-widest">Cancel</Button>
-                  <Button onClick={handleSave} className="flex-2 bg-primary-900 text-white hover:bg-black rounded-full h-14 px-12 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl">
-                    <Save size={16} /> Save Changes
+                  <Button disabled={isCreatingMenu || isUpdatingMenu} onClick={handleSave} className="flex-2 bg-primary-900 text-white hover:bg-black rounded-full h-14 px-12 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl disabled:opacity-50">
+                    <Save size={16} /> {isCreatingMenu || isUpdatingMenu ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </div>
               </div>
@@ -319,55 +265,38 @@ const ChefMenus = () => {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMenus.length > 0 ? (
+        {isLoading ? (
+          <div className="lg:col-span-3 py-32 text-center text-gray-400 text-sm">Loading menus...</div>
+        ) : filteredMenus.length > 0 ? (
           filteredMenus.map((menu) => (
-            <Card key={menu.id} className="p-0 overflow-hidden border-transparent bg-white shadow-sm hover:shadow-xl transition-all group rounded-[32px] animate-in zoom-in-95 duration-300">
+            <Card key={menu._id} className="p-0 overflow-hidden border-transparent bg-white shadow-sm hover:shadow-xl transition-all group rounded-[32px] animate-in zoom-in-95 duration-300">
               <div className="relative h-56 overflow-hidden">
-                <img src={menu.image} alt={menu.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <img src={menu.menuImage?.startsWith('http') ? menu.menuImage : `http://localhost:8005${menu.menuImage}`} alt={menu.menuTitle} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                   <div className="flex gap-2">
-                    {menu.isPopular && (
-                      <Badge className="bg-accent/90 backdrop-blur-md text-primary-900 border-none font-black px-3 py-1 text-[8px] uppercase tracking-widest">Popular</Badge>
-                    )}
                     <Badge
-                      variant={menu.status === 'Active' ? 'success' : 'outline'}
-                      className={`${menu.status === 'Active' ? 'bg-white/90 backdrop-blur-md text-green-700' : 'bg-black/50 backdrop-blur-md text-white border-none'} font-black px-3 py-1 text-[8px] uppercase tracking-widest cursor-pointer hover:scale-110 active:scale-95 transition-all shadow-sm flex items-center gap-1.5`}
-                      onClick={(e) => { e.stopPropagation(); handleToggleStatus(menu.id); }}
-                      title="Click to toggle status"
+                      variant='success'
+                      className="bg-white/90 backdrop-blur-md text-green-700 font-black px-3 py-1 text-[8px] uppercase tracking-widest shadow-sm flex items-center gap-1.5"
                     >
-                      <div className={`w-1 h-1 rounded-full ${menu.status === 'Active' ? 'bg-green-500 animate-pulse' : 'bg-white/50'}`} />
-                      {menu.status}
+                      <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+                      Active
                     </Badge>
                   </div>
                   <div className="relative">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveDropdown(activeDropdown === menu.id ? null : menu.id);
+                        setActiveDropdown(activeDropdown === menu._id ? null : menu._id);
                       }}
                       className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/40"
                     >
                       <MoreVertical size={16} />
                     </button>
 
-                    {activeDropdown === menu.id && (
+                    {activeDropdown === menu._id && (
                       <div className="absolute right-0 top-10 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in zoom-in-95 duration-200">
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleDuplicate(menu); }}
-                          className="w-full px-5 py-2.5 text-left text-[10px] font-bold text-gray-600 hover:text-primary-900 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                        >
-                          <Layers size={14} /> Duplicate Menu
-                        </button>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleTogglePopular(menu.id); }}
-                          className="w-full px-5 py-2.5 text-left text-[10px] font-bold text-gray-600 hover:text-primary-900 hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                        >
-                          <Star size={14} className={menu.isPopular ? "fill-accent text-accent" : ""} />
-                          {menu.isPopular ? "Remove Popular" : "Mark as Popular"}
-                        </button>
-                        <div className="h-px bg-gray-50 my-2 mx-5" />
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleDelete(menu.id); }}
+                          onClick={(e) => { e.stopPropagation(); handleDelete(menu._id); }}
                           className="w-full px-5 py-2.5 text-left text-[10px] font-bold text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors"
                         >
                           <Trash2 size={14} /> Delete Menu
@@ -381,19 +310,15 @@ const ChefMenus = () => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-accent">
                     <Star size={12} className="fill-accent" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">{menu.category}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">{menu.menuCategory}</span>
                   </div>
-                  <h3 className="text-xl font-serif text-primary-900 italic leading-tight">{menu.title}</h3>
+                  <h3 className="text-xl font-serif text-primary-900 italic leading-tight">{menu.menuTitle}</h3>
                 </div>
 
                 <div className="flex items-center justify-between py-4 border-y border-gray-50">
                   <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Base Price</span>
-                    <span className="text-sm font-bold text-primary-900">{menu.price}</span>
-                  </div>
-                  <div className="flex flex-col text-right">
                     <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Menu Depth</span>
-                    <span className="text-sm font-bold text-primary-900">{menu.courses} Courses</span>
+                    <span className="text-sm font-bold text-primary-900">{menu.numberOfCourse} Courses</span>
                   </div>
                 </div>
 
@@ -407,7 +332,7 @@ const ChefMenus = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => handleDelete(menu.id)}
+                    onClick={() => handleDelete(menu._id)}
                     className="flex-1 rounded-xl border-red-50 bg-red-50/50 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all text-[9px] font-black uppercase tracking-widest h-12 flex items-center justify-center gap-2"
                   >
                     <Trash2 size={14} /> Delete

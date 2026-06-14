@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, User, Settings2 } from "lucide-react";
+import { LogOut, User, Bell, CheckCircle2 } from "lucide-react";
 import { Button } from "../ui/Button";
+import { 
+  useGetNotificationsQuery, 
+  useMarkNotificationAsReadMutation, 
+  useMarkAllNotificationsAsReadMutation 
+} from "../../redux/api/notificationApi";
 
 export default function Header() {
   const location = useLocation();
@@ -9,6 +14,37 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Notifications API
+  const { data: notifRes, refetch: refetchNotifs } = useGetNotificationsQuery(undefined, {
+    skip: !isLoggedIn,
+    pollingInterval: 30000, // poll every 30s
+  });
+  const [markAsRead] = useMarkNotificationAsReadMutation();
+  const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
+
+  const notifications = notifRes?.data || [];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const handleMarkAsRead = async (e, id) => {
+    e.stopPropagation();
+    try {
+      await markAsRead(id).unwrap();
+      refetchNotifs();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllAsRead().unwrap();
+      refetchNotifs();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Check login state
   useEffect(() => {
@@ -152,8 +188,74 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
+
+                {/* Notifications Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 text-gray-600 hover:text-primary-900 hover:bg-gray-100 transition-all border border-gray-100 shadow-sm"
+                  >
+                    <Bell size={18} />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-white">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                      <div className="flex items-center justify-between p-4 border-b border-gray-50 bg-gray-50/50">
+                        <h3 className="font-bold text-primary-900 text-sm">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={handleMarkAllRead}
+                            className="text-[11px] font-bold text-accent hover:text-primary-900 transition-colors"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-80 overflow-y-auto">
+                        {notifications.length > 0 ? (
+                          notifications.map((notif) => (
+                            <div
+                              key={notif._id}
+                              className={`p-4 border-b border-gray-50 last:border-none hover:bg-gray-50 transition-colors flex gap-3 ${
+                                !notif.isRead ? "bg-accent/5" : ""
+                              }`}
+                            >
+                              <div className="flex-1 flex flex-col gap-1">
+                                <h4 className="text-xs font-bold text-primary-900">{notif.title}</h4>
+                                <p className="text-[11px] text-gray-500 leading-snug">{notif.message}</p>
+                                <span className="text-[9px] font-medium text-gray-400 mt-1 uppercase tracking-wider">
+                                  {new Date(notif.createdAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              {!notif.isRead && (
+                                <button
+                                  onClick={(e) => handleMarkAsRead(e, notif._id)}
+                                  className="self-center p-1.5 text-accent hover:text-green-600 hover:bg-green-50 rounded-full transition-colors"
+                                  title="Mark as read"
+                                >
+                                  <CheckCircle2 size={14} />
+                                </button>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-8 text-center text-gray-400 text-xs italic">
+                            No notifications yet
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex items-center gap-2 bg-gray-50 p-1.5 rounded-full border border-gray-100">
-                  {!location.pathname.includes('/chef-onboarding') && (
+                  {!location.pathname.includes("/chef-onboarding") && (
                     <Link
                       to={getDashboardUrl(loggedInUser)}
                       className="flex items-center gap-2 text-sm font-bold text-primary-900 hover:bg-white transition-all px-4 py-2 rounded-full"
@@ -267,7 +369,7 @@ export default function Header() {
                       </Button>
                     </Link>
                   )}
-                  {!location.pathname.includes('/chef-onboarding') && (
+                  {!location.pathname.includes("/chef-onboarding") && (
                     <Link
                       to={getDashboardUrl(loggedInUser)}
                       onClick={() => setMenuOpen(false)}

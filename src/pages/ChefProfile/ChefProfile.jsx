@@ -1,12 +1,59 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useGetProfileByUserIdQuery } from '../../redux/api/profileApi';
+import { useGetUserReviewsQuery } from '../../redux/api/reviewApi';
+import { useGetFavoritesQuery, useToggleFavoriteMutation } from '../../redux/api/userApi';
+import { useCreateConversationMutation } from '../../redux/api/chatApi';
+import { Heart, X } from 'lucide-react';
 
 export default function ChefProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
   const { data, isLoading, error } = useGetProfileByUserIdQuery(id, { skip: !id });
   const profileResponse = data?.data;
+  
+  const { data: reviewsRes } = useGetUserReviewsQuery(id, { skip: !id });
+  const reviewsData = reviewsRes?.data?.reviews || [];
+  const metaData = reviewsRes?.data?.meta || {};
+
+  const userToken = localStorage.getItem('accessToken');
+  const { data: favoritesRes } = useGetFavoritesQuery(undefined, { skip: !userToken });
+  const favoriteChefs = favoritesRes?.data || [];
+  const [toggleFavorite] = useToggleFavoriteMutation();
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
+
+  const handleToggleFavorite = async (e) => {
+    e.preventDefault();
+    if (!userToken) {
+      navigate('/login');
+      return;
+    }
+    try {
+      await toggleFavorite(id).unwrap();
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
+  };
+
+  const handleMessageChef = async (e) => {
+    e.preventDefault();
+    if (!userToken) {
+      navigate('/login');
+      return;
+    }
+    try {
+      const res = await createConversation(id).unwrap();
+      const newConvId = res.data._id;
+      navigate(`/messages?convId=${newConvId}`);
+    } catch (error) {
+      console.error("Failed to create conversation:", error);
+    }
+  };
+
+  const isFavorite = favoriteChefs.some(fav => fav._id === id || fav.id === id);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -14,6 +61,20 @@ export default function ChefProfile() {
   const [activeTab, setActiveTab] = useState('BIOGRAPHY');
   const [guests, setGuests] = useState(2);
   const [selectedDate, setSelectedDate] = useState('');
+  
+  // Menu Modal State
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+
+  const openMenuModal = (menu) => {
+    setSelectedMenu(menu);
+    setIsMenuModalOpen(true);
+  };
+
+  const closeMenuModal = () => {
+    setIsMenuModalOpen(false);
+    setTimeout(() => setSelectedMenu(null), 300);
+  };
 
   const scrollToSection = (id) => {
     const sectionMap = {
@@ -47,8 +108,8 @@ export default function ChefProfile() {
   const fullName = profileResponse.fullName || profileResponse.displayName || profileResponse.userId?.userName || "Chef";
   const firstName = fullName.split(' ')[0];
   const specialty = profileResponse.cuisineSpecialties?.[0] || profileResponse.chefCategory?.[0] || "";
-  const rating = profileResponse.rating || 0;
-  const reviewCount = profileResponse.reviewCount || 0;
+  const rating = Number(metaData.averageRating || profileResponse.userId?.averageRating || 0).toFixed(1);
+  const reviewCount = metaData.reviewsReceived || profileResponse.userId?.totalReviews || 0;
   const location = [profileResponse.city, profileResponse.country].filter(Boolean).join(', ') || profileResponse.travelRadiusLocation || "Location not provided";
   const aboutMe = profileResponse.aboutMe || "No biography provided.";
   const signatureMenus = profileResponse.menuBuilder || [];
@@ -112,16 +173,32 @@ export default function ChefProfile() {
               {aboutMe}
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-10">
-              <Link to={`/book/${id}`}>
-                <Button variant="primary" className="bg-black text-white px-10 py-5 rounded-lg text-xs font-bold tracking-widest uppercase shadow-xl hover:bg-gray-800 transition-all">
-                  BOOK CHEF {fullName.split(' ')[0].toUpperCase()}
-                </Button>
-              </Link>
-              <Link to={`/messages?userId=${id}`} className="group text-xs font-bold uppercase tracking-widest text-gray-900 flex items-center gap-3 transition-all">
-                <span className="border-b border-transparent group-hover:border-gray-900 pb-1">Message {fullName.split(' ')[0]}</span>
-                <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
-              </Link>
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-10">
+                <Link to={`/book/${id}`}>
+                  <Button variant="primary" className="bg-black text-white px-10 py-5 rounded-lg text-xs font-bold tracking-widest uppercase shadow-xl hover:bg-gray-800 transition-all">
+                    BOOK CHEF {fullName.split(' ')[0].toUpperCase()}
+                  </Button>
+                </Link>
+                <button 
+                  onClick={handleMessageChef}
+                  disabled={isCreatingChat}
+                  className="group text-xs font-bold uppercase tracking-widest text-gray-900 flex items-center gap-3 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <span className="border-b border-transparent group-hover:border-gray-900 pb-1">
+                    {isCreatingChat ? "Starting Chat..." : `Message ${fullName.split(' ')[0]}`}
+                  </span>
+                  <span className="text-lg transition-transform group-hover:translate-x-1">→</span>
+                </button>
+              </div>
+              
+              <button 
+                onClick={handleToggleFavorite}
+                className="w-12 h-12 sm:ml-4 rounded-full border border-gray-200 flex items-center justify-center text-red-500 shadow-sm hover:bg-gray-50 transition-colors"
+                title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart size={20} fill={isFavorite ? "currentColor" : "none"} strokeWidth={isFavorite ? 0 : 2} />
+              </button>
             </div>
           </div>
         </div>
@@ -181,15 +258,28 @@ export default function ChefProfile() {
               <div className="grid md:grid-cols-2 gap-8">
                 {signatureMenus.length > 0 ? (
                   signatureMenus.map((menu) => (
-                    <div key={menu._id} className="bg-white p-10 rounded-3xl shadow-sm border border-gray-50 flex flex-col h-full transition-all hover:shadow-xl group">
-                      <h4 className="text-2xl font-serif text-gray-900 mb-8 leading-tight group-hover:text-[#D4AF37] transition-colors">{menu.title}</h4>
+                    <div key={menu._id} className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-gray-50 flex flex-col h-full transition-all hover:shadow-xl group">
+                      {(menu.menuImage || menu.image) && (
+                        <div className="w-full h-48 rounded-2xl overflow-hidden mb-8">
+                          <img 
+                            src={(menu.menuImage || menu.image).startsWith('http') ? (menu.menuImage || menu.image) : `http://localhost:8005${menu.menuImage || menu.image}`} 
+                            alt={menu.title || menu.menuTitle} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                        </div>
+                      )}
+                      <h4 className="text-2xl font-serif text-gray-900 mb-8 leading-tight group-hover:text-[#D4AF37] transition-colors">{menu.title || menu.menuTitle}</h4>
                       <div className="flex justify-between items-center mb-8 pb-8 border-b border-gray-50">
                         <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">{menu.courses} COURSES</span>
                       </div>
                       <p className="text-gray-500 text-sm leading-relaxed mb-10 flex-grow font-light">
                         {menu.description || "A meticulously crafted signature menu tailored for your special occasion."}
                       </p>
-                      <Button variant="outline" className="w-full rounded-full border-gray-200 text-xs font-bold tracking-widest uppercase py-5 hover:bg-black hover:text-white transition-all">
+                      <Button 
+                        onClick={() => openMenuModal(menu)}
+                        variant="outline" 
+                        className="w-full rounded-full border-gray-200 text-xs font-bold tracking-widest uppercase py-5 hover:bg-black hover:text-white transition-all"
+                      >
                         VIEW MENU
                       </Button>
                     </div>
@@ -243,21 +333,24 @@ export default function ChefProfile() {
               <h3 className="text-4xl font-serif text-gray-900 mb-12 leading-tight">Guest Reflections</h3>
 
               <div className="flex flex-col gap-8">
-                {profileResponse.reviews && profileResponse.reviews.length > 0 ? (
-                  profileResponse.reviews.map((review, idx) => (
+                {reviewsData && reviewsData.length > 0 ? (
+                  reviewsData.map((review, idx) => (
                     <div key={idx} className="bg-white p-10 md:p-14 rounded-3xl shadow-sm border border-gray-50">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6 mb-8">
                         <div>
-                          <h5 className="font-bold text-gray-900 text-lg mb-2">{review.name}</h5>
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{review.event}</span>
+                          <h5 className="font-bold text-gray-900 text-lg mb-2">{review.reviewerId?.userName || review.reviewerId?.name || "Guest"}</h5>
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{review.bookingId?.eventLocation || "Private Event"}</span>
                         </div>
                         <div className="flex gap-1 text-[#FDE047] text-xl">
                           {'★'.repeat(review.rating || 5)}
                         </div>
                       </div>
                       <p className="text-gray-500 text-lg leading-relaxed font-light italic">
-                        "{review.text}"
+                        "{review.comment}"
                       </p>
+                      <span className="text-xs text-gray-400 mt-4 block">
+                        {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
                     </div>
                   ))
                 ) : (
@@ -356,6 +449,88 @@ export default function ChefProfile() {
           </div>
         </div>
       </section>
+      {/* View Menu Modal */}
+      {isMenuModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div 
+            className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300"
+          >
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <h3 className="text-2xl font-serif text-primary-900 italic">Menu Details</h3>
+              <button 
+                onClick={closeMenuModal}
+                className="p-2 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="overflow-y-auto p-6 md:p-8">
+              {selectedMenu && (
+                <div className="flex flex-col gap-8">
+                  {selectedMenu.menuImage && (
+                    <div className="w-full h-64 rounded-2xl overflow-hidden">
+                      <img 
+                        src={selectedMenu.menuImage.startsWith('http') ? selectedMenu.menuImage : `http://localhost:8005${selectedMenu.menuImage}`} 
+                        alt={selectedMenu.title || selectedMenu.menuTitle} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex flex-col gap-2">
+                    <span className="text-xs font-bold text-accent tracking-widest uppercase">
+                      {selectedMenu.menuCategory || "Signature"} • {selectedMenu.courses || selectedMenu.numberOfCourse || 0} Courses
+                    </span>
+                    <h2 className="text-3xl font-serif text-gray-900 leading-tight">
+                      {selectedMenu.title || selectedMenu.menuTitle}
+                    </h2>
+                  </div>
+                  
+                  <div className="text-gray-600 font-light leading-relaxed">
+                    {selectedMenu.description || "A meticulously crafted signature menu tailored for your special occasion. This menu showcases the best seasonal ingredients and the chef's culinary mastery."}
+                  </div>
+
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mt-4">
+                    <h4 className="text-sm font-bold text-gray-900 tracking-widest uppercase mb-4">Course Breakdown Overview</h4>
+                    <p className="text-sm text-gray-500 italic">
+                      This is a {selectedMenu.courses || selectedMenu.numberOfCourse || 0}-course experience. The exact items will be discussed and finalized between you and the chef to accommodate your dietary preferences and seasonal availability.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-4">
+              <Button 
+                onClick={closeMenuModal}
+                variant="outline" 
+                className="rounded-xl px-6 py-2.5 text-sm font-bold border-gray-200"
+              >
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  closeMenuModal();
+                  const target = document.getElementById('booking-section');
+                  if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="bg-primary-900 text-white rounded-xl px-8 py-2.5 text-sm font-bold hover:bg-black shadow-lg shadow-gray-200"
+              >
+                Book This Menu
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
