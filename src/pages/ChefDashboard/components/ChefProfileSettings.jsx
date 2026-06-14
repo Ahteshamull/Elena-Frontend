@@ -27,34 +27,55 @@ import {
 } from "../../../redux/api/profileApi";
 import { toast } from "react-toastify";
 
-const ModalOverlay = ({ title, description, children, onClose, onConfirm, confirmText, variant = "primary", isLoading = false }) => (
+const ModalOverlay = ({
+  title,
+  description,
+  children,
+  onClose,
+  onConfirm,
+  confirmText,
+  variant = "primary",
+  isLoading = false,
+}) => (
   <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 animate-in fade-in duration-300">
-    <div className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm" onClick={onClose} />
+    <div
+      className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm"
+      onClick={onClose}
+    />
     <Card className="relative w-full max-w-lg bg-white p-6 md:p-8 rounded-t-[40px] md:rounded-[40px] shadow-2xl border-transparent animate-in slide-in-from-bottom md:zoom-in-95 duration-300">
-      <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400">
+      <button
+        onClick={onClose}
+        className="absolute top-6 right-6 p-2 hover:bg-gray-50 rounded-full transition-colors text-gray-400"
+      >
         <X size={20} />
       </button>
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-serif text-primary-900 italic">{title}</h3>
+          <h3 className="text-2xl font-serif text-primary-900 italic">
+            {title}
+          </h3>
           <p className="text-sm text-gray-500 font-medium">{description}</p>
         </div>
 
-        <div className="py-4">
-          {children}
-        </div>
+        <div className="py-4">{children}</div>
 
         <div className="flex items-center gap-3 pt-4">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest border-gray-100">Cancel</Button>
-          <Button 
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest border-gray-100"
+          >
+            Cancel
+          </Button>
+          <Button
             onClick={onConfirm}
             disabled={isLoading}
             className={cn(
               "flex-1 rounded-full py-4 text-[10px] font-black uppercase tracking-widest shadow-xl",
-              variant === "danger" 
-                ? "bg-red-600 text-white hover:bg-red-700 shadow-red-200" 
-                : "bg-primary-900 text-white hover:bg-black shadow-gray-200"
+              variant === "danger"
+                ? "bg-red-600 text-white hover:bg-red-700 shadow-red-200"
+                : "bg-primary-900 text-white hover:bg-black shadow-gray-200",
             )}
           >
             {isLoading ? "Processing..." : confirmText}
@@ -110,8 +131,13 @@ const ChefProfileSettings = () => {
   const [newLanguage, setNewLanguage] = useState("");
 
   const [activeModal, setActiveModal] = useState(null);
-  const [passwords, setPasswords] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  const [changePassword, { isLoading: isChangingPassword }] = useChangePasswordMutation();
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [changePassword, { isLoading: isChangingPassword }] =
+    useChangePasswordMutation();
 
   const handlePasswordChange = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) {
@@ -119,13 +145,17 @@ const ChefProfileSettings = () => {
       return;
     }
     try {
-      const res = await changePassword({ 
-        currentPassword: passwords.currentPassword, 
+      const res = await changePassword({
+        currentPassword: passwords.currentPassword,
         newPassword: passwords.newPassword,
-        confirmPassword: passwords.confirmPassword
+        confirmPassword: passwords.confirmPassword,
       }).unwrap();
       setActiveModal(null);
-      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setPasswords({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
       toast.success(res.message || "Password changed successfully");
     } catch (error) {
       console.error("Failed to change password", error);
@@ -178,7 +208,7 @@ const ChefProfileSettings = () => {
     if (!url) return null;
     if (url.startsWith("http") || url.startsWith("blob:")) return url;
     // Assuming backend is at localhost:8005
-    return `http://localhost:8005${url}`;
+    return `https://elena-backend-eaoh.onrender.com${url}`;
   };
 
   const handleAddCuisine = () => {
@@ -900,11 +930,11 @@ const ChefProfileSettings = () => {
             <Button className="bg-primary-900 text-white hover:bg-black rounded-full py-4 text-[10px] font-black uppercase tracking-widest">
               Save Social Links
             </Button>
-            <Button 
-              onClick={() => setActiveModal('password')}
+            <Button
+              onClick={() => setActiveModal("password")}
               className="bg-primary-900 text-white hover:bg-black rounded-full py-4 text-[10px] font-black uppercase tracking-widest"
             >
-              Change Your Password 
+              Change Your Password
             </Button>
           </Card>
         </div>
@@ -934,7 +964,7 @@ const ChefProfileSettings = () => {
         </Button>
       </div>
 
-      {activeModal === 'password' && (
+      {activeModal === "password" && (
         <ModalOverlay
           title="Change Password"
           description="Protect your account with a secure, unique password."
@@ -945,39 +975,56 @@ const ChefProfileSettings = () => {
         >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Current Password</label>
-              <Input 
-                type="password" 
-                placeholder="••••••••" 
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                Current Password
+              </label>
+              <Input
+                type="password"
+                placeholder="••••••••"
                 value={passwords.currentPassword}
-                onChange={(e) => setPasswords({...passwords, currentPassword: e.target.value})}
-                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+                onChange={(e) =>
+                  setPasswords({
+                    ...passwords,
+                    currentPassword: e.target.value,
+                  })
+                }
+                className="h-12 bg-gray-50 border-transparent rounded-xl"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">New Password</label>
-              <Input 
-                type="password" 
-                placeholder="••••••••" 
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                New Password
+              </label>
+              <Input
+                type="password"
+                placeholder="••••••••"
                 value={passwords.newPassword}
-                onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
-                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+                onChange={(e) =>
+                  setPasswords({ ...passwords, newPassword: e.target.value })
+                }
+                className="h-12 bg-gray-50 border-transparent rounded-xl"
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Confirm New Password</label>
-              <Input 
-                type="password" 
-                placeholder="••••••••" 
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                Confirm New Password
+              </label>
+              <Input
+                type="password"
+                placeholder="••••••••"
                 value={passwords.confirmPassword}
-                onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
-                className="h-12 bg-gray-50 border-transparent rounded-xl" 
+                onChange={(e) =>
+                  setPasswords({
+                    ...passwords,
+                    confirmPassword: e.target.value,
+                  })
+                }
+                className="h-12 bg-gray-50 border-transparent rounded-xl"
               />
             </div>
           </div>
         </ModalOverlay>
       )}
-
     </div>
   );
 };

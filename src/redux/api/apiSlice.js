@@ -4,15 +4,17 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_URL || "http://localhost:8005/api/v1",
+    baseUrl:
+      import.meta.env.VITE_BASE_URL ||
+      "https://elena-backend-eaoh.onrender.com/api/v1",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem("accessToken");
       if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  tagTypes: ['Favorites', 'Menu', 'Conversation', 'Message'],
+  tagTypes: ["Favorites", "Menu", "Conversation", "Message"],
   endpoints: (builder) => ({}),
 });

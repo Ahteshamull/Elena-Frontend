@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
   Plus,
   Edit2,
@@ -17,22 +17,22 @@ import {
   Save,
   Image as ImageIcon,
   DollarSign,
-  Layers
-} from 'lucide-react';
-import { Card } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
-import { Badge } from '../../../components/ui/Badge';
-import { Input } from '../../../components/ui/Input';
+  Layers,
+} from "lucide-react";
+import { Card } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
+import { Badge } from "../../../components/ui/Badge";
+import { Input } from "../../../components/ui/Input";
 
 import {
   useGetMyMenusQuery,
   useCreateMenuMutation,
   useUpdateMenuMutation,
-  useDeleteMenuMutation
-} from '../../../redux/api/menuApi';
+  useDeleteMenuMutation,
+} from "../../../redux/api/menuApi";
 
 const ChefMenus = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
@@ -45,9 +45,10 @@ const ChefMenus = () => {
   const menusData = menusRes?.data || [];
 
   const filteredMenus = useMemo(() => {
-    return menusData.filter(menu =>
-      menu.menuTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      menu.menuCategory?.toLowerCase().includes(searchTerm.toLowerCase())
+    return menusData.filter(
+      (menu) =>
+        menu.menuTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        menu.menuCategory?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [menusData, searchTerm]);
 
@@ -62,13 +63,15 @@ const ChefMenus = () => {
   };
 
   const handleEdit = (menu) => {
-    setEditingMenu({ 
-      id: menu._id, 
-      title: menu.menuTitle, 
-      category: menu.menuCategory, 
+    setEditingMenu({
+      id: menu._id,
+      title: menu.menuTitle,
+      category: menu.menuCategory,
       courses: menu.numberOfCourse,
-      imagePreview: menu.menuImage?.startsWith('http') ? menu.menuImage : `http://localhost:8005${menu.menuImage}`,
-      imageFile: null
+      imagePreview: menu.menuImage?.startsWith("http")
+        ? menu.menuImage
+        : `https://elena-backend-eaoh.onrender.com${menu.menuImage}`,
+      imageFile: null,
     });
     setIsEditing(true);
     setIsCreating(false);
@@ -76,18 +79,18 @@ const ChefMenus = () => {
 
   const handleSave = async () => {
     const formData = new FormData();
-    formData.append('menuTitle', editingMenu.title);
-    formData.append('menuCategory', editingMenu.category);
-    formData.append('numberOfCourse', editingMenu.courses);
-    
+    formData.append("menuTitle", editingMenu.title);
+    formData.append("menuCategory", editingMenu.category);
+    formData.append("numberOfCourse", editingMenu.courses);
+
     if (editingMenu.imageFile) {
-      formData.append('menuImage', editingMenu.imageFile);
+      formData.append("menuImage", editingMenu.imageFile);
     }
 
     try {
       if (isCreating) {
         if (!editingMenu.imageFile) {
-          alert('Menu image is required');
+          alert("Menu image is required");
           return;
         }
         await createMenu(formData).unwrap();
@@ -109,7 +112,7 @@ const ChefMenus = () => {
       category: "",
       courses: 1,
       imagePreview: "",
-      imageFile: null
+      imageFile: null,
     });
     setIsCreating(true);
     setIsEditing(true);
@@ -124,68 +127,117 @@ const ChefMenus = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative" onClick={() => setActiveDropdown(null)}>
+    <div
+      className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 relative"
+      onClick={() => setActiveDropdown(null)}
+    >
       {/* Edit Form Overlay */}
       {isEditing && (
         <div className="fixed inset-0 z-[100] flex items-center justify-end">
-          <div className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm animate-in fade-in duration-500" onClick={(e) => { e.stopPropagation(); handleCancel(); }} />
-          <div className="relative w-full h-full bg-white shadow-2xl animate-in slide-in-from-right duration-500 p-6 md:p-12 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="absolute inset-0 bg-primary-900/40 backdrop-blur-sm animate-in fade-in duration-500"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCancel();
+            }}
+          />
+          <div
+            className="relative w-full h-full bg-white shadow-2xl animate-in slide-in-from-right duration-500 p-6 md:p-12 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex flex-col gap-10">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-3xl font-serif text-primary-900 italic">{isCreating ? 'Create Menu' : 'Edit Menu'}</h2>
-                  <p className="text-gray-400 text-sm font-medium">{isCreating ? 'Design your new experience.' : 'Refine your culinary experience.'}</p>
+                  <h2 className="text-3xl font-serif text-primary-900 italic">
+                    {isCreating ? "Create Menu" : "Edit Menu"}
+                  </h2>
+                  <p className="text-gray-400 text-sm font-medium">
+                    {isCreating
+                      ? "Design your new experience."
+                      : "Refine your culinary experience."}
+                  </p>
                 </div>
-                <button onClick={handleCancel} className="p-3 bg-gray-50 text-gray-400 hover:text-primary-900 hover:bg-gray-100 rounded-full transition-all">
+                <button
+                  onClick={handleCancel}
+                  className="p-3 bg-gray-50 text-gray-400 hover:text-primary-900 hover:bg-gray-100 rounded-full transition-all"
+                >
                   <X size={24} />
                 </button>
               </div>
 
               <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Menu Title</label>
+                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">
+                    Menu Title
+                  </label>
                   <Input
                     value={editingMenu.title}
-                    onChange={(e) => setEditingMenu({ ...editingMenu, title: e.target.value })}
+                    onChange={(e) =>
+                      setEditingMenu({ ...editingMenu, title: e.target.value })
+                    }
                     placeholder="Enter menu title"
                     className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
                   />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Category</label>
+                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">
+                    Category
+                  </label>
                   <Input
                     value={editingMenu.category}
-                    onChange={(e) => setEditingMenu({ ...editingMenu, category: e.target.value })}
+                    onChange={(e) =>
+                      setEditingMenu({
+                        ...editingMenu,
+                        category: e.target.value,
+                      })
+                    }
                     placeholder="e.g. Fine Dining"
                     className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
                   />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Number of Courses</label>
+                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">
+                    Number of Courses
+                  </label>
                   <Input
                     type="number"
                     value={editingMenu.courses}
-                    onChange={(e) => setEditingMenu({ ...editingMenu, courses: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setEditingMenu({
+                        ...editingMenu,
+                        courses: parseInt(e.target.value),
+                      })
+                    }
                     className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 text-sm font-bold"
                   />
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">Menu Header Image</label>
+                  <label className="text-[10px] font-black text-primary-900 uppercase tracking-widest">
+                    Menu Header Image
+                  </label>
                   <div
                     className="relative group/upload h-48 rounded-[32px] border-2 border-dashed border-gray-100 bg-gray-50 flex flex-col items-center justify-center gap-3 overflow-hidden hover:border-accent hover:bg-accent/5 transition-all cursor-pointer"
-                    onClick={() => document.getElementById('menu-image-upload').click()}
+                    onClick={() =>
+                      document.getElementById("menu-image-upload").click()
+                    }
                   >
                     {editingMenu.imagePreview ? (
                       <>
-                        <img src={editingMenu.imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover/upload:opacity-20 transition-opacity" />
+                        <img
+                          src={editingMenu.imagePreview}
+                          alt="Preview"
+                          className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover/upload:opacity-20 transition-opacity"
+                        />
                         <div className="relative z-10 flex flex-col items-center gap-2">
                           <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-center text-primary-900">
                             <ImageIcon size={20} />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-primary-900">Change Image</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-primary-900">
+                            Change Image
+                          </span>
                         </div>
                       </>
                     ) : (
@@ -194,8 +246,12 @@ const ChefMenus = () => {
                           <Plus size={24} />
                         </div>
                         <div className="flex flex-col items-center gap-1">
-                          <span className="text-xs font-bold text-primary-900 uppercase tracking-widest">Upload Image</span>
-                          <p className="text-[10px] text-gray-400 font-medium">JPG, PNG up to 5MB</p>
+                          <span className="text-xs font-bold text-primary-900 uppercase tracking-widest">
+                            Upload Image
+                          </span>
+                          <p className="text-[10px] text-gray-400 font-medium">
+                            JPG, PNG up to 5MB
+                          </p>
                         </div>
                       </>
                     )}
@@ -209,7 +265,11 @@ const ChefMenus = () => {
                         if (file) {
                           const reader = new FileReader();
                           reader.onloadend = () => {
-                            setEditingMenu({ ...editingMenu, imagePreview: reader.result, imageFile: file });
+                            setEditingMenu({
+                              ...editingMenu,
+                              imagePreview: reader.result,
+                              imageFile: file,
+                            });
                           };
                           reader.readAsDataURL(file);
                         }
@@ -223,15 +283,33 @@ const ChefMenus = () => {
                     <ChefHat size={20} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs font-bold text-primary-900">Elite Presentation</span>
-                    <p className="text-[10px] text-gray-400 leading-relaxed">Ensure your menu descriptions are as captivating as your flavors. High-quality imagery increases bookings by 40%.</p>
+                    <span className="text-xs font-bold text-primary-900">
+                      Elite Presentation
+                    </span>
+                    <p className="text-[10px] text-gray-400 leading-relaxed">
+                      Ensure your menu descriptions are as captivating as your
+                      flavors. High-quality imagery increases bookings by 40%.
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex gap-4 pt-6">
-                  <Button variant="outline" onClick={handleCancel} className="flex-1 h-14 rounded-full text-[10px] font-black uppercase tracking-widest">Cancel</Button>
-                  <Button disabled={isCreatingMenu || isUpdatingMenu} onClick={handleSave} className="flex-2 bg-primary-900 text-white hover:bg-black rounded-full h-14 px-12 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl disabled:opacity-50">
-                    <Save size={16} /> {isCreatingMenu || isUpdatingMenu ? 'Saving...' : 'Save Changes'}
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="flex-1 h-14 rounded-full text-[10px] font-black uppercase tracking-widest"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={isCreatingMenu || isUpdatingMenu}
+                    onClick={handleSave}
+                    className="flex-2 bg-primary-900 text-white hover:bg-black rounded-full h-14 px-12 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl disabled:opacity-50"
+                  >
+                    <Save size={16} />{" "}
+                    {isCreatingMenu || isUpdatingMenu
+                      ? "Saving..."
+                      : "Save Changes"}
                   </Button>
                 </div>
               </div>
@@ -242,12 +320,19 @@ const ChefMenus = () => {
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">My Menus</h1>
-          <p className="text-gray-500 font-medium text-sm md:text-base">Create and manage your signature culinary offerings.</p>
+          <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">
+            My Menus
+          </h1>
+          <p className="text-gray-500 font-medium text-sm md:text-base">
+            Create and manage your signature culinary offerings.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative flex-1 md:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={16}
+            />
             <Input
               placeholder="Search menus..."
               value={searchTerm}
@@ -259,23 +344,37 @@ const ChefMenus = () => {
             onClick={handleCreate}
             className="bg-primary-900 text-white hover:bg-black rounded-full px-4 md:px-8 h-11 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl shrink-0"
           >
-            <Plus size={16} /> <span className="hidden sm:inline">Create New</span>
+            <Plus size={16} />{" "}
+            <span className="hidden sm:inline">Create New</span>
           </Button>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
-          <div className="lg:col-span-3 py-32 text-center text-gray-400 text-sm">Loading menus...</div>
+          <div className="lg:col-span-3 py-32 text-center text-gray-400 text-sm">
+            Loading menus...
+          </div>
         ) : filteredMenus.length > 0 ? (
           filteredMenus.map((menu) => (
-            <Card key={menu._id} className="p-0 overflow-hidden border-transparent bg-white shadow-sm hover:shadow-xl transition-all group rounded-[32px] animate-in zoom-in-95 duration-300">
+            <Card
+              key={menu._id}
+              className="p-0 overflow-hidden border-transparent bg-white shadow-sm hover:shadow-xl transition-all group rounded-[32px] animate-in zoom-in-95 duration-300"
+            >
               <div className="relative h-56 overflow-hidden">
-                <img src={menu.menuImage?.startsWith('http') ? menu.menuImage : `http://localhost:8005${menu.menuImage}`} alt={menu.menuTitle} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                <img
+                  src={
+                    menu.menuImage?.startsWith("http")
+                      ? menu.menuImage
+                      : `https://elena-backend-eaoh.onrender.com${menu.menuImage}`
+                  }
+                  alt={menu.menuTitle}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                   <div className="flex gap-2">
                     <Badge
-                      variant='success'
+                      variant="success"
                       className="bg-white/90 backdrop-blur-md text-green-700 font-black px-3 py-1 text-[8px] uppercase tracking-widest shadow-sm flex items-center gap-1.5"
                     >
                       <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
@@ -286,7 +385,9 @@ const ChefMenus = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveDropdown(activeDropdown === menu._id ? null : menu._id);
+                        setActiveDropdown(
+                          activeDropdown === menu._id ? null : menu._id,
+                        );
                       }}
                       className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/40"
                     >
@@ -296,7 +397,10 @@ const ChefMenus = () => {
                     {activeDropdown === menu._id && (
                       <div className="absolute right-0 top-10 w-48 bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 animate-in fade-in zoom-in-95 duration-200">
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleDelete(menu._id); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(menu._id);
+                          }}
                           className="w-full px-5 py-2.5 text-left text-[10px] font-bold text-red-500 hover:bg-red-50 flex items-center gap-3 transition-colors"
                         >
                           <Trash2 size={14} /> Delete Menu
@@ -310,15 +414,23 @@ const ChefMenus = () => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-accent">
                     <Star size={12} className="fill-accent" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">{menu.menuCategory}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      {menu.menuCategory}
+                    </span>
                   </div>
-                  <h3 className="text-xl font-serif text-primary-900 italic leading-tight">{menu.menuTitle}</h3>
+                  <h3 className="text-xl font-serif text-primary-900 italic leading-tight">
+                    {menu.menuTitle}
+                  </h3>
                 </div>
 
                 <div className="flex items-center justify-between py-4 border-y border-gray-50">
                   <div className="flex flex-col">
-                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Menu Depth</span>
-                    <span className="text-sm font-bold text-primary-900">{menu.numberOfCourse} Courses</span>
+                    <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                      Menu Depth
+                    </span>
+                    <span className="text-sm font-bold text-primary-900">
+                      {menu.numberOfCourse} Courses
+                    </span>
                   </div>
                 </div>
 
@@ -347,8 +459,12 @@ const ChefMenus = () => {
               <Inbox size={32} />
             </div>
             <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-bold text-primary-900">No menus found</h3>
-              <p className="text-sm text-gray-400 font-medium">Try a different search term or create a new menu.</p>
+              <h3 className="text-lg font-bold text-primary-900">
+                No menus found
+              </h3>
+              <p className="text-sm text-gray-400 font-medium">
+                Try a different search term or create a new menu.
+              </p>
             </div>
           </div>
         )}
@@ -362,8 +478,12 @@ const ChefMenus = () => {
             <Plus size={32} />
           </div>
           <div className="flex flex-col gap-1 text-center px-8">
-            <span className="text-sm font-bold text-primary-900">Add Signature Menu</span>
-            <p className="text-xs text-gray-400 font-medium">Design a new dining experience for your clients.</p>
+            <span className="text-sm font-bold text-primary-900">
+              Add Signature Menu
+            </span>
+            <p className="text-xs text-gray-400 font-medium">
+              Design a new dining experience for your clients.
+            </p>
           </div>
         </button>
       </div>

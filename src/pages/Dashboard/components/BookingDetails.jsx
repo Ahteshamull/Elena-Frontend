@@ -1,24 +1,24 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  MapPin, 
-  Clock, 
-  Users, 
-  ChefHat, 
-  Utensils, 
-  MessageSquare, 
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Clock,
+  Users,
+  ChefHat,
+  Utensils,
+  MessageSquare,
   AlertTriangle,
   CreditCard,
   FileText,
   ChevronRight,
-  Loader2
-} from 'lucide-react';
-import { Button } from '../../../components/ui/Button';
-import { Card } from '../../../components/ui/Card';
-import { Badge } from '../../../components/ui/Badge';
-import { useGetBookingDetailsQuery } from '../../../redux/api/bookingApi';
+  Loader2,
+} from "lucide-react";
+import { Button } from "../../../components/ui/Button";
+import { Card } from "../../../components/ui/Card";
+import { Badge } from "../../../components/ui/Badge";
+import { useGetBookingDetailsQuery } from "../../../redux/api/bookingApi";
 
 const BookingDetails = () => {
   const { id } = useParams();
@@ -39,8 +39,13 @@ const BookingDetails = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
         <AlertTriangle className="w-12 h-12 text-red-500" />
-        <h2 className="text-xl font-bold text-primary-900">Booking not found</h2>
-        <Button onClick={() => navigate('/dashboard/bookings')} className="bg-primary-900 text-white rounded-xl mt-4">
+        <h2 className="text-xl font-bold text-primary-900">
+          Booking not found
+        </h2>
+        <Button
+          onClick={() => navigate("/dashboard/bookings")}
+          className="bg-primary-900 text-white rounded-xl mt-4"
+        >
           Return to Bookings
         </Button>
       </div>
@@ -50,18 +55,21 @@ const BookingDetails = () => {
   const { bookingDetails, chefInfo } = bookingData;
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'TBD';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    if (!dateString) return "TBD";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   const getImageUrl = (url) => {
-    if (!url || url === 'undefined' || url === 'null') return "https://images.unsplash.com/photo-1583394293214-28dea15ee548?auto=format&fit=crop&q=80&w=200";
-    if (url.startsWith('http')) return url;
-    return url.startsWith('/') ? `http://localhost:8005${url}` : `http://localhost:8005/${url}`;
+    if (!url || url === "undefined" || url === "null")
+      return "https://images.unsplash.com/photo-1583394293214-28dea15ee548?auto=format&fit=crop&q=80&w=200";
+    if (url.startsWith("http")) return url;
+    return url.startsWith("/")
+      ? `https://elena-backend-eaoh.onrender.com${url}`
+      : `https://elena-backend-eaoh.onrender.com/${url}`;
   };
 
   // Calculate generic payment details based on totalAmount
@@ -71,41 +79,56 @@ const BookingDetails = () => {
   const tax = (totalAmount * 0.1).toFixed(2);
 
   return (
-    <div id="printable-receipt" className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div
+      id="printable-receipt"
+      className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
       {/* Header */}
       <div className="flex flex-col gap-6">
-        <button 
-          onClick={() => navigate('/dashboard/bookings')}
+        <button
+          onClick={() => navigate("/dashboard/bookings")}
           className="no-print flex items-center gap-2 text-gray-400 hover:text-primary-900 transition-colors text-xs font-bold uppercase tracking-widest w-fit"
         >
           <ArrowLeft size={14} /> Back to Bookings
         </button>
-        
+
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4">
-              <h1 className="text-4xl font-serif text-primary-900 italic">Booking Details</h1>
-              <Badge 
-                variant={bookingDetails.status === 'confirmed' ? 'success' : bookingDetails.status === 'pending' ? 'default' : 'secondary'}
+              <h1 className="text-4xl font-serif text-primary-900 italic">
+                Booking Details
+              </h1>
+              <Badge
+                variant={
+                  bookingDetails.status === "confirmed"
+                    ? "success"
+                    : bookingDetails.status === "pending"
+                      ? "default"
+                      : "secondary"
+                }
                 className="border-none px-4 py-1.5 font-black text-[9px] tracking-widest uppercase"
               >
                 {bookingDetails.status}
               </Badge>
             </div>
-            <p className="text-gray-500 font-medium">Reference: {bookingDetails._id.substring(0,8).toUpperCase()}</p>
+            <p className="text-gray-500 font-medium">
+              Reference: {bookingDetails._id.substring(0, 8).toUpperCase()}
+            </p>
           </div>
 
           <div className="no-print flex items-center gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="rounded-xl border-gray-100 gap-2 text-[10px] font-black tracking-widest uppercase py-4 px-6"
               onClick={() => window.print()}
             >
               <FileText size={14} /> Download Receipt
             </Button>
-            <Button 
+            <Button
               className="rounded-xl bg-primary-900 text-white hover:bg-black gap-2 text-[10px] font-black tracking-widest uppercase py-4 px-6 shadow-lg"
-              onClick={() => navigate(`/messages?userId=${chefInfo?._id || chefInfo?.id}`)}
+              onClick={() =>
+                navigate(`/messages?userId=${chefInfo?._id || chefInfo?.id}`)
+              }
             >
               <MessageSquare size={14} /> Message Chef
             </Button>
@@ -116,20 +139,33 @@ const BookingDetails = () => {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Left Column: Details */}
         <div className="lg:col-span-2 flex flex-col gap-8">
-          
           {/* Section: Chef & Menu */}
           <Card className="p-8 border-transparent bg-white shadow-sm rounded-[32px]">
             <div className="flex flex-col gap-8">
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-accent/20">
-                  <img src={getImageUrl(chefInfo?.image || chefInfo?.profile?.image)} alt={chefInfo?.userName || chefInfo?.fullName || 'Chef'} className="w-full h-full object-cover" />
+                  <img
+                    src={getImageUrl(
+                      chefInfo?.image || chefInfo?.profile?.image,
+                    )}
+                    alt={chefInfo?.userName || chefInfo?.fullName || "Chef"}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase">Private Chef</span>
-                  <h3 className="text-2xl font-bold text-primary-900">{chefInfo?.userName || chefInfo?.fullName}</h3>
+                  <span className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase">
+                    Private Chef
+                  </span>
+                  <h3 className="text-2xl font-bold text-primary-900">
+                    {chefInfo?.userName || chefInfo?.fullName}
+                  </h3>
                   <div className="flex items-center gap-4 mt-1">
-                    <Badge className="bg-gray-50 text-gray-400 border-none text-[9px] font-bold px-3">★ 4.9</Badge>
-                    <button className="text-[10px] font-bold text-primary-900 hover:underline">View Profile</button>
+                    <Badge className="bg-gray-50 text-gray-400 border-none text-[9px] font-bold px-3">
+                      ★ 4.9
+                    </Badge>
+                    <button className="text-[10px] font-bold text-primary-900 hover:underline">
+                      View Profile
+                    </button>
                   </div>
                 </div>
               </div>
@@ -137,8 +173,12 @@ const BookingDetails = () => {
               <div className="pt-8 border-t border-gray-50 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col gap-1">
-                    <h4 className="text-lg font-bold text-primary-900">Custom Culinary Experience</h4>
-                    <p className="text-xs text-gray-400 font-medium">Prepared by your private chef</p>
+                    <h4 className="text-lg font-bold text-primary-900">
+                      Custom Culinary Experience
+                    </h4>
+                    <p className="text-xs text-gray-400 font-medium">
+                      Prepared by your private chef
+                    </p>
                   </div>
                   <Utensils size={24} className="text-gray-100" />
                 </div>
@@ -146,8 +186,13 @@ const BookingDetails = () => {
                 <div className="grid gap-4">
                   <div className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50/50 border border-transparent hover:border-gray-100 transition-all">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Special Requests / Notes</span>
-                      <span className="text-sm font-bold text-primary-900">{bookingDetails.specialRequests || 'No special requests provided.'}</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                        Special Requests / Notes
+                      </span>
+                      <span className="text-sm font-bold text-primary-900">
+                        {bookingDetails.specialRequests ||
+                          "No special requests provided."}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -166,12 +211,20 @@ const BookingDetails = () => {
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</span>
-                  <span className="text-sm font-bold text-primary-900">{formatDate(bookingDetails.eventDate)}</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    Date
+                  </span>
+                  <span className="text-sm font-bold text-primary-900">
+                    {formatDate(bookingDetails.eventDate)}
+                  </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Arrival Time</span>
-                  <span className="text-sm font-bold text-primary-900">{bookingDetails.arrivalTime}</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    Arrival Time
+                  </span>
+                  <span className="text-sm font-bold text-primary-900">
+                    {bookingDetails.arrivalTime}
+                  </span>
                 </div>
               </div>
             </Card>
@@ -181,16 +234,26 @@ const BookingDetails = () => {
                 <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-primary-900">
                   <Users size={20} />
                 </div>
-                <h4 className="text-lg font-bold text-primary-900">Party Size</h4>
+                <h4 className="text-lg font-bold text-primary-900">
+                  Party Size
+                </h4>
               </div>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Guests</span>
-                  <span className="text-sm font-bold text-primary-900">{bookingDetails.numberOfGuests} Persons</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    Total Guests
+                  </span>
+                  <span className="text-sm font-bold text-primary-900">
+                    {bookingDetails.numberOfGuests} Persons
+                  </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Client Contact</span>
-                  <span className="text-sm font-bold text-primary-900">{bookingDetails.phone}</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    Client Contact
+                  </span>
+                  <span className="text-sm font-bold text-primary-900">
+                    {bookingDetails.phone}
+                  </span>
                 </div>
               </div>
             </Card>
@@ -203,9 +266,15 @@ const BookingDetails = () => {
                 <h4 className="text-lg font-bold text-primary-900">Location</h4>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Event Address</span>
-                <span className="text-sm font-bold text-primary-900">{bookingDetails.eventLocation || 'TBD'}</span>
-                <button className="text-[10px] font-bold text-accent mt-2 uppercase tracking-widest hover:underline text-left">View on Map</button>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Event Address
+                </span>
+                <span className="text-sm font-bold text-primary-900">
+                  {bookingDetails.eventLocation || "TBD"}
+                </span>
+                <button className="text-[10px] font-bold text-accent mt-2 uppercase tracking-widest hover:underline text-left">
+                  View on Map
+                </button>
               </div>
             </Card>
           </div>
@@ -215,10 +284,17 @@ const BookingDetails = () => {
         <div className="flex flex-col gap-8">
           {/* Quick Management Action */}
           <Card className="no-print p-8 border-transparent bg-white shadow-sm rounded-[32px] flex flex-col gap-4">
-            <h4 className="text-lg font-bold text-primary-900">Experience Management</h4>
-            <p className="text-xs text-gray-500 leading-relaxed font-medium">Need to reschedule or modify your guest list? Access our management suite.</p>
-            <Button 
-              onClick={() => navigate(`/dashboard/bookings/${bookingDetails._id}/manage`)}
+            <h4 className="text-lg font-bold text-primary-900">
+              Experience Management
+            </h4>
+            <p className="text-xs text-gray-500 leading-relaxed font-medium">
+              Need to reschedule or modify your guest list? Access our
+              management suite.
+            </p>
+            <Button
+              onClick={() =>
+                navigate(`/dashboard/bookings/${bookingDetails._id}/manage`)
+              }
               className="w-full bg-primary-900 text-white hover:bg-black rounded-xl py-4 text-[10px] font-black tracking-widest uppercase shadow-lg flex items-center justify-center gap-3"
             >
               Manage This Booking <ChevronRight size={16} />
@@ -248,22 +324,33 @@ const BookingDetails = () => {
                 </div>
                 <div className="pt-4 border-t border-white/10 flex justify-between items-center">
                   <span className="text-sm font-bold">Total Charged</span>
-                  <span className="text-xl font-bold text-accent">${totalAmount.toLocaleString()}</span>
+                  <span className="text-xl font-bold text-accent">
+                    ${totalAmount.toLocaleString()}
+                  </span>
                 </div>
               </div>
 
               <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3">
                 <CreditCard size={16} className="text-white/40" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Payment Status: {bookingDetails.paymentStatus}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">
+                  Payment Status: {bookingDetails.paymentStatus}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Support Note */}
           <div className="p-8 rounded-[32px] bg-gray-50 flex flex-col gap-4 border border-gray-100">
-            <h4 className="text-sm font-bold text-primary-900">Need Assistance?</h4>
-            <p className="text-xs text-gray-500 leading-relaxed font-medium">If you have any questions regarding this booking, please contact our 24/7 Elite Concierge.</p>
-            <button className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline text-left">Contact Concierge</button>
+            <h4 className="text-sm font-bold text-primary-900">
+              Need Assistance?
+            </h4>
+            <p className="text-xs text-gray-500 leading-relaxed font-medium">
+              If you have any questions regarding this booking, please contact
+              our 24/7 Elite Concierge.
+            </p>
+            <button className="text-[10px] font-black text-accent uppercase tracking-widest hover:underline text-left">
+              Contact Concierge
+            </button>
           </div>
         </div>
       </div>

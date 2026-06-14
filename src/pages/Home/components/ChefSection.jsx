@@ -55,12 +55,14 @@ export default function ChefSection() {
               const profile = user.profile || {};
               const id = user._id;
               const name = profile.fullName || user.userName;
-              
+
               const rawImage = profile.image || user.image;
-              const image = rawImage 
-                ? (rawImage.startsWith('http') ? rawImage : `http://localhost:8005${rawImage}`) 
-                : '/b_1.png';
-                
+              const image = rawImage
+                ? rawImage.startsWith("http")
+                  ? rawImage
+                  : `https://elena-backend-eaoh.onrender.com${rawImage}`
+                : "/b_1.png";
+
               const rating = profile.rating || "5.0";
               const reviews = profile.reviewCount || "0";
               const specialty =

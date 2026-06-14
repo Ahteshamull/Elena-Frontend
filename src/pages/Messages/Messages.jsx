@@ -298,7 +298,11 @@ export default function Messages() {
                     <div className="relative flex-shrink-0">
                       {partner.image ? (
                         <img
-                          src={partner.image.startsWith('http') ? partner.image : `http://localhost:8005${partner.image}`}
+                          src={
+                            partner.image.startsWith("http")
+                              ? partner.image
+                              : `https://elena-backend-eaoh.onrender.com${partner.image}`
+                          }
                           alt={partner.userName}
                           className="w-12 h-12 rounded-full object-cover"
                         />
@@ -385,7 +389,11 @@ export default function Messages() {
                   <div className="relative flex-shrink-0">
                     {activePartner.image ? (
                       <img
-                        src={activePartner.image.startsWith('http') ? activePartner.image : `http://localhost:8005${activePartner.image}`}
+                        src={
+                          activePartner.image.startsWith("http")
+                            ? activePartner.image
+                            : `https://elena-backend-eaoh.onrender.com${activePartner.image}`
+                        }
                         alt={activePartner.userName}
                         className="w-12 h-12 rounded-full object-cover"
                       />

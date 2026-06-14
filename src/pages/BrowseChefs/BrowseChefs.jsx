@@ -207,7 +207,7 @@ export default function BrowseChefs() {
                 const image = rawImage
                   ? rawImage.startsWith("http")
                     ? rawImage
-                    : `http://localhost:8005${rawImage}`
+                    : `https://elena-backend-eaoh.onrender.com${rawImage}`
                   : "/b_1.png";
 
                 const rating = Number(user.averageRating).toFixed(1) || "5.0";
