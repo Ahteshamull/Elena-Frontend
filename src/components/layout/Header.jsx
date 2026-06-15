@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LogOut, User, Bell, CheckCircle2 } from "lucide-react";
 import { Button } from "../ui/Button";
-import { 
-  useGetNotificationsQuery, 
-  useMarkNotificationAsReadMutation, 
-  useMarkAllNotificationsAsReadMutation 
+import {
+  useGetNotificationsQuery,
+  useMarkNotificationAsReadMutation,
+  useMarkAllNotificationsAsReadMutation,
 } from "../../redux/api/notificationApi";
 
 export default function Header() {
@@ -17,10 +17,13 @@ export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false);
 
   // Notifications API
-  const { data: notifRes, refetch: refetchNotifs } = useGetNotificationsQuery(undefined, {
-    skip: !isLoggedIn,
-    pollingInterval: 30000, // poll every 30s
-  });
+  const { data: notifRes, refetch: refetchNotifs } = useGetNotificationsQuery(
+    undefined,
+    {
+      skip: !isLoggedIn,
+      pollingInterval: 30000, // poll every 30s
+    },
+  );
   const [markAsRead] = useMarkNotificationAsReadMutation();
   const [markAllAsRead] = useMarkAllNotificationsAsReadMutation();
 
@@ -207,7 +210,9 @@ export default function Header() {
                   {showNotifications && (
                     <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
                       <div className="flex items-center justify-between p-4 border-b border-gray-50 bg-gray-50/50">
-                        <h3 className="font-bold text-primary-900 text-sm">Notifications</h3>
+                        <h3 className="font-bold text-primary-900 text-sm">
+                          Notifications
+                        </h3>
                         {unreadCount > 0 && (
                           <button
                             onClick={handleMarkAllRead}
@@ -227,15 +232,23 @@ export default function Header() {
                               }`}
                             >
                               <div className="flex-1 flex flex-col gap-1">
-                                <h4 className="text-xs font-bold text-primary-900">{notif.title}</h4>
-                                <p className="text-[11px] text-gray-500 leading-snug">{notif.message}</p>
+                                <h4 className="text-xs font-bold text-primary-900">
+                                  {notif.title}
+                                </h4>
+                                <p className="text-[11px] text-gray-500 leading-snug">
+                                  {notif.message}
+                                </p>
                                 <span className="text-[9px] font-medium text-gray-400 mt-1 uppercase tracking-wider">
-                                  {new Date(notif.createdAt).toLocaleDateString()}
+                                  {new Date(
+                                    notif.createdAt,
+                                  ).toLocaleDateString()}
                                 </span>
                               </div>
                               {!notif.isRead && (
                                 <button
-                                  onClick={(e) => handleMarkAsRead(e, notif._id)}
+                                  onClick={(e) =>
+                                    handleMarkAsRead(e, notif._id)
+                                  }
                                   className="self-center p-1.5 text-accent hover:text-green-600 hover:bg-green-50 rounded-full transition-colors"
                                   title="Mark as read"
                                 >
@@ -293,6 +306,14 @@ export default function Header() {
                     className="rounded-full px-6 h-10 text-sm font-bold"
                   >
                     Sign up
+                  </Button>
+                </Link>
+                <Link to="/register?role=chef">
+                  <Button
+                    variant="primary"
+                    className="moving-border-btn rounded-full px-6 h-10 text-sm font-bold"
+                  >
+                    Join as a chef
                   </Button>
                 </Link>
               </>
@@ -406,6 +427,17 @@ export default function Header() {
                       className="rounded-full px-6 w-full h-12 text-base font-bold"
                     >
                       Sign up
+                    </Button>
+                  </Link>
+                  <Link
+                    to="/register?role=chef"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Button
+                      variant="primary"
+                      className="moving-border-btn rounded-full px-6 w-full h-12 text-base font-bold"
+                    >
+                      <span className="relative z-10">Join as a chef</span>
                     </Button>
                   </Link>
                 </>
