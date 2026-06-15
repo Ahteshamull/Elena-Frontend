@@ -158,7 +158,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <MapPin size={16} className="text-accent" />
-                <span>Miami, FL</span>
+                <span>Miami- Florida</span>
               </li>
             </ul>
           </div>
