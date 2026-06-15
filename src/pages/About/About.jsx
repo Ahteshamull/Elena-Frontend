@@ -275,7 +275,7 @@ export default function About() {
               Join Our Platform
             </h2>
             <p className="text-gray-300 text-lg">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Experience culinary excellence in the comfort of your own home. Whether you're hosting an intimate gathering or a grand celebration, our platform connects you with world-class private chefs dedicated to crafting unforgettable bespoke dining experiences.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 w-full sm:w-auto">
               {loggedInUser?.role !== "chef" && (

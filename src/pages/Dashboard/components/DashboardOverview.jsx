@@ -94,7 +94,7 @@ const DashboardOverview = () => {
                 </div>
                 <div className="md:w-3/5 p-5 md:p-8 flex flex-col gap-4 md:gap-6 bg-white">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-accent tracking-[0.2em] uppercase">Private Chef Experience</span>
+                    <span className="text-[14px] font-bold text-accent tracking-[0.2em] uppercase">Private Chef Experience</span>
                     <h4 className="text-xl md:text-2xl font-serif text-primary-900">{nextBooking.chefName}</h4>
                   </div>
 
