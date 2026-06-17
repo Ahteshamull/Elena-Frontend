@@ -67,8 +67,8 @@ const ChefBookingDetails = () => {
     if (!url || url === "undefined" || url === "null") return "";
     if (url.startsWith("http")) return url;
     return url.startsWith("/")
-      ? `https://elena-backend-eaoh.onrender.com${url}`
-      : `https://elena-backend-eaoh.onrender.com/${url}`;
+      ? `https://api.tableli.com${url}`
+      : `https://api.tableli.com/${url}`;
   };
 
   const clientName =

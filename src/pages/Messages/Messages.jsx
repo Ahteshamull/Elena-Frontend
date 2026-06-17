@@ -301,7 +301,7 @@ export default function Messages() {
                           src={
                             partner.image.startsWith("http")
                               ? partner.image
-                              : `https://elena-backend-eaoh.onrender.com${partner.image}`
+                              : `https://api.tableli.com${partner.image}`
                           }
                           alt={partner.userName}
                           className="w-12 h-12 rounded-full object-cover"
@@ -392,7 +392,7 @@ export default function Messages() {
                         src={
                           activePartner.image.startsWith("http")
                             ? activePartner.image
-                            : `https://elena-backend-eaoh.onrender.com${activePartner.image}`
+                            : `https://api.tableli.com${activePartner.image}`
                         }
                         alt={activePartner.userName}
                         className="w-12 h-12 rounded-full object-cover"

@@ -83,7 +83,7 @@ const SavedChefs = () => {
             const image = rawImage
               ? rawImage.startsWith("http")
                 ? rawImage
-                : `https://elena-backend-eaoh.onrender.com${rawImage}`
+                : `https://api.tableli.com${rawImage}`
               : "/b_1.png";
 
             const isVerified = chefUser.isVerify;

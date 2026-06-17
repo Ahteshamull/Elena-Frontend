@@ -349,7 +349,7 @@ const Profile = () => {
                         profileData?.profile?.image
                           ? profileData.profile.image.startsWith("http")
                             ? profileData.profile.image
-                            : `https://elena-backend-eaoh.onrender.com${profileData.profile.image}`
+                            : `https://api.tableli.com${profileData.profile.image}`
                           : "/b_1.png"
                       }
                       alt="Profile"

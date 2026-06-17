@@ -127,7 +127,7 @@ export default function ChefProfile() {
   const image = rawImage
     ? rawImage.startsWith("http")
       ? rawImage
-      : `https://elena-backend-eaoh.onrender.com${rawImage}`
+      : `https://api.tableli.com${rawImage}`
     : "";
   const fullName =
     profileResponse.fullName ||
@@ -159,9 +159,7 @@ export default function ChefProfile() {
   ];
 
   const finalGallery = rawGallery.map((img) =>
-    img.startsWith("http")
-      ? img
-      : `https://elena-backend-eaoh.onrender.com${img}`,
+    img.startsWith("http") ? img : `https://api.tableli.com${img}`,
   );
 
   return (
@@ -346,7 +344,7 @@ export default function ChefProfile() {
                             src={
                               (menu.menuImage || menu.image).startsWith("http")
                                 ? menu.menuImage || menu.image
-                                : `https://elena-backend-eaoh.onrender.com${menu.menuImage || menu.image}`
+                                : `https://api.tableli.com${menu.menuImage || menu.image}`
                             }
                             alt={menu.title || menu.menuTitle}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -622,7 +620,7 @@ export default function ChefProfile() {
                         src={
                           selectedMenu.menuImage.startsWith("http")
                             ? selectedMenu.menuImage
-                            : `https://elena-backend-eaoh.onrender.com${selectedMenu.menuImage}`
+                            : `https://api.tableli.com${selectedMenu.menuImage}`
                         }
                         alt={selectedMenu.title || selectedMenu.menuTitle}
                         className="w-full h-full object-cover"

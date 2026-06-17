@@ -208,7 +208,7 @@ const ChefProfileSettings = () => {
     if (!url) return null;
     if (url.startsWith("http") || url.startsWith("blob:")) return url;
     // Assuming backend is at localhost:8005
-    return `https://elena-backend-eaoh.onrender.com${url}`;
+    return `https://api.tableli.com${url}`;
   };
 
   const handleAddCuisine = () => {
