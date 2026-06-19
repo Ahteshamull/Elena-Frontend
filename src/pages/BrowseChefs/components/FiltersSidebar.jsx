@@ -150,7 +150,7 @@ export default function FiltersSidebar({
         <input
           type="range"
           min="1"
-          max="100"
+          max="5000"
           value={filters.maxPrice}
           onChange={(e) =>
             setFilters({ ...filters, maxPrice: parseInt(e.target.value) })

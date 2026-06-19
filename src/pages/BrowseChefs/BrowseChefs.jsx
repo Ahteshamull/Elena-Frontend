@@ -15,7 +15,7 @@ export default function BrowseChefs() {
     location: urlLocation,
     date: urlDate,
     cuisines: [],
-    maxPrice: 100,
+    maxPrice: 5000,
   });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState("HIGHEST RATED");
