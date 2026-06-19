@@ -11,6 +11,8 @@ const AvailabilityStep = ({
   setValue,
   instantBooking,
   setInstantBooking,
+  alwaysAvailable,
+  setAlwaysAvailable,
   availableDates,
   setAvailableDates,
   selectedServiceWindows,
@@ -44,15 +46,27 @@ const AvailabilityStep = ({
           <div>
             <h3 className="text-2xl font-bold text-primary-900 mb-2">Service Availability</h3>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-[8px] font-black text-gray-400 tracking-widest uppercase">Instant Booking</span>
-            <Toggle 
-              checked={instantBooking} 
-              onChange={(val) => { 
-                setInstantBooking(val); 
-                setValue('instantBooking', val); 
-              }} 
-            />
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-4">
+              <span className="text-[8px] font-black text-gray-400 tracking-widest uppercase">Always Available</span>
+              <Toggle 
+                checked={alwaysAvailable} 
+                onChange={(val) => { 
+                  setAlwaysAvailable(val); 
+                  setValue('alwaysAvailable', val); 
+                }} 
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-[8px] font-black text-gray-400 tracking-widest uppercase">Instant Booking</span>
+              <Toggle 
+                checked={instantBooking} 
+                onChange={(val) => { 
+                  setInstantBooking(val); 
+                  setValue('instantBooking', val); 
+                }} 
+              />
+            </div>
           </div>
         </div>
 

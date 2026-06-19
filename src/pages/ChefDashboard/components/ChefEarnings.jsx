@@ -280,13 +280,13 @@ const ChefEarnings = () => {
             </div>
 
             <div className="flex gap-4">
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={() => setShowPayoutModal(true)}
                 className="w-full border-white/20 !text-white hover:bg-white/10 rounded-full py-5 text-[10px] font-black uppercase tracking-widest"
               >
                 Manage Payout Method
-              </Button>
+              </Button> */}
             </div>
           </div>
           <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-accent/10 rounded-full blur-[100px]" />

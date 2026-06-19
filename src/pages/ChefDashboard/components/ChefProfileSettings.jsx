@@ -19,6 +19,7 @@ import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
 import { Badge } from "../../../components/ui/Badge";
+import { Calendar } from "../../../components/ui/Calendar";
 import { cn } from "../../../utils/cn";
 import { useChangePasswordMutation } from "../../../redux/api/authApi";
 import {
@@ -126,9 +127,11 @@ const ChefProfileSettings = () => {
     chefCategory: [],
     serviceWindows: [],
     instantBooking: false,
+    alwaysAvailable: false,
   });
   const [languages, setLanguages] = useState([]);
   const [newLanguage, setNewLanguage] = useState("");
+  const [availableDates, setAvailableDates] = useState([]);
 
   const [activeModal, setActiveModal] = useState(null);
   const [passwords, setPasswords] = useState({
@@ -198,9 +201,15 @@ const ChefProfileSettings = () => {
         chefCategory: profile.chefCategory || [],
         serviceWindows: profile.serviceWindows || [],
         instantBooking: profile.instantBooking || false,
+        alwaysAvailable: profile.alwaysAvailable || false,
       });
 
       setLanguages(profile.languages || []);
+      setAvailableDates(
+        profile.availableDates
+          ? profile.availableDates.map((d) => new Date(d))
+          : [],
+      );
     }
   }, [profileRes]);
 
@@ -283,6 +292,7 @@ const ChefProfileSettings = () => {
 
       // Service
       payload.append("instantBooking", serviceSettings.instantBooking);
+      payload.append("alwaysAvailable", serviceSettings.alwaysAvailable);
       payload.append(
         "chefCategory",
         JSON.stringify(serviceSettings.chefCategory),
@@ -291,6 +301,7 @@ const ChefProfileSettings = () => {
         "serviceWindows",
         JSON.stringify(serviceSettings.serviceWindows),
       );
+      payload.append("availableDates", JSON.stringify(availableDates));
 
       // Languages
       payload.append("languages", JSON.stringify(languages));
@@ -491,8 +502,8 @@ const ChefProfileSettings = () => {
                   <Input
                     value={years}
                     onChange={(e) => setYears(e.target.value)}
-                    type="number"
                     className="h-14 bg-gray-50 border-transparent rounded-2xl px-6 font-bold"
+                    placeholder="e.g. 5, 10+, etc."
                   />
                 </div>
                 <div className="flex flex-col gap-2 md:col-span-2">
@@ -682,6 +693,55 @@ const ChefProfileSettings = () => {
             <div className="flex flex-col gap-8">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-primary-900 font-serif italic">
+                  Availability Calendar
+                </h3>
+              </div>
+              {!serviceSettings.alwaysAvailable ? (
+                <div className="flex flex-col gap-6">
+                  <div className="relative border border-gray-100 rounded-3xl p-6 bg-white shadow-sm overflow-x-auto">
+                    <Calendar
+                      selectedDates={availableDates}
+                      onChange={(dates) => setAvailableDates(dates)}
+                    />
+                  </div>
+                  {availableDates.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        Selected Dates ({availableDates.length})
+                      </span>
+                      <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                        {availableDates.map((date, idx) => (
+                          <Badge
+                            key={idx}
+                            className="bg-primary-900 text-white border-none py-1.5 px-3 text-[10px]"
+                          >
+                            {new Date(date).toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-green-50 p-6 rounded-2xl flex items-center justify-center border border-green-100">
+                  <p className="text-sm text-green-700 font-bold">
+                    You are marked as always available. Disable "Always
+                    Available" in settings to pick specific dates.
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className="p-8 md:p-12 border-gray-100 bg-white rounded-[40px] shadow-sm mt-8">
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-primary-900 font-serif italic">
                   Identity & Verification
                 </h3>
                 {profile.status === "approved" && (
@@ -834,6 +894,22 @@ const ChefProfileSettings = () => {
                   />
                   <span className="text-sm font-bold text-primary-900">
                     Enable Instant Booking
+                  </span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer mt-2">
+                  <input
+                    type="checkbox"
+                    checked={serviceSettings.alwaysAvailable}
+                    onChange={(e) =>
+                      setServiceSettings({
+                        ...serviceSettings,
+                        alwaysAvailable: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4 rounded text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm font-bold text-primary-900">
+                    Always Available
                   </span>
                 </label>
                 <div className="flex flex-col gap-2 mt-2">

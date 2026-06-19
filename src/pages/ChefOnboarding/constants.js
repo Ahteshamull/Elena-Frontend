@@ -31,6 +31,7 @@ export const step2Schema = z.object({
 
 export const step3Schema = z.object({
   instantBooking: z.boolean(),
+  alwaysAvailable: z.boolean().default(false),
   serviceWindows: z.array(z.string()).min(1, 'Select at least one service window'),
   travelRadius: z.number().min(5).max(100),
   taxId: z.string().optional(),

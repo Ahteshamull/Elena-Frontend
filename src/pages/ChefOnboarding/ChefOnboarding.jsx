@@ -50,6 +50,7 @@ const ChefOnboarding = () => {
   
   // Step 3 specific states
   const [instantBooking, setInstantBooking] = useState(false);
+  const [alwaysAvailable, setAlwaysAvailable] = useState(false);
   const [selectedServiceWindows, setSelectedServiceWindows] = useState(['Dinner']);
   const [travelRadius, setTravelRadius] = useState(45);
   const [availableDates, setAvailableDates] = useState([]);
@@ -91,6 +92,7 @@ const ChefOnboarding = () => {
       bio: '',
       selectedMenuTier: 'GOURMET',
       instantBooking: false,
+      alwaysAvailable: false,
       serviceWindows: ['Dinner'],
       travelRadius: 45,
       currency: 'USD ($)',
@@ -110,6 +112,7 @@ const ChefOnboarding = () => {
     console.log('Selected Category:', selectedCategory);
     console.log('Selected Menu Tier:', selectedMenuTier);
     console.log('Instant Booking Enabled:', instantBooking);
+    console.log('Always Available Enabled:', alwaysAvailable);
     console.log('Selected Service Windows:', selectedServiceWindows);
     console.log('Travel Radius:', travelRadius);
     console.log('Available Dates (Calendar):', availableDates);
@@ -130,6 +133,7 @@ const ChefOnboarding = () => {
     selectedCategory,
     selectedMenuTier,
     instantBooking,
+    alwaysAvailable,
     selectedServiceWindows,
     travelRadius,
     availableDates,
@@ -179,6 +183,7 @@ const ChefOnboarding = () => {
         instagramProfile: finalData.instagram || "",
         portfolioWebsite: finalData.website || "",
         instantBooking: finalData.instantBooking,
+        alwaysAvailable: finalData.alwaysAvailable,
         availableDates: availableDates,
         serviceWindows: finalData.serviceWindows,
         travelRadius: finalData.travelRadius,
@@ -282,6 +287,8 @@ const ChefOnboarding = () => {
               setValue={setValue}
               instantBooking={instantBooking}
               setInstantBooking={setInstantBooking}
+              alwaysAvailable={alwaysAvailable}
+              setAlwaysAvailable={setAlwaysAvailable}
               availableDates={availableDates}
               setAvailableDates={setAvailableDates}
               selectedServiceWindows={selectedServiceWindows}
