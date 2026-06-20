@@ -87,7 +87,7 @@ const ChefBookingDetails = () => {
   return (
     <div
       id="printable-receipt"
-      className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700"
+      className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0"
     >
       {/* Header */}
       <div className="flex flex-col gap-6">

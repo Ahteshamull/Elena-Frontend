@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect, useState } from 'react';
+import { MotionConfig, MotionGlobalConfig } from 'framer-motion';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home/Home';
@@ -32,9 +34,26 @@ import CancellationPolicy from './pages/Support/cancellation';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 
 function App() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      MotionGlobalConfig.skipAnimations = mobile;
+    };
+    
+    // Set initial value
+    MotionGlobalConfig.skipAnimations = window.innerWidth < 768;
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <Router>
-      <ScrollToTop />
+    <MotionConfig reducedMotion={isMobile ? "always" : "user"}>
+      <Router>
+        <ScrollToTop />
       <div className="min-h-screen flex flex-col font-sans text-gray-900 bg-[#FAFAFA]">
         <Header />
         <main className="flex-grow">
@@ -107,6 +126,7 @@ function App() {
         toastClassName="custom-toast"
       />
     </Router>
+    </MotionConfig>
   );
 }
 

@@ -1017,7 +1017,7 @@ const ChefProfileSettings = () => {
       </div>
 
       {/* Fixed Footer Update Button */}
-      <div className="fixed bottom-0 left-0 right-0 md:bottom-8 md:left-1/2 md:-translate-x-1/2 z-40 px-4 md:px-0 pb-safe">
+      <div className="fixed bottom-20 left-0 right-0 md:bottom-8 md:left-1/2 md:-translate-x-1/2 z-40 px-4 md:px-0 pb-safe">
         <Button
           onClick={handleSaveProfile}
           disabled={isSaving}

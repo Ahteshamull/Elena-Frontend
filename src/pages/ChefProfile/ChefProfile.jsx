@@ -265,7 +265,7 @@ export default function ChefProfile() {
       <section className="w-full max-w-7xl mx-auto px-6 mt-12 md:mt-20">
         <div className="grid lg:grid-cols-12 gap-16 items-start">
           {/* Left Column: Main Content (8 cols) */}
-          <div className="col-span-1 lg:col-span-8 flex flex-col">
+          <div className="col-span-1 lg:col-span-8 flex flex-col order-2 lg:order-1">
             {/* Navigation Tabs */}
             <div className="sticky top-0 z-20 bg-[#FAFAFA]/95 backdrop-blur-md pt-4 pb-6 border-b border-gray-100 mb-16 flex gap-12 overflow-x-auto no-scrollbar">
               {["BIOGRAPHY", "SIGNATURE MENUS", "GALLERY", "REVIEWS"].map(
@@ -486,7 +486,7 @@ export default function ChefProfile() {
           </div>
 
           {/* Right Column: Sticky Booking Sidebar (4 cols) */}
-          <div className="col-span-1 lg:col-span-4 lg:sticky lg:top-32 pb-12">
+          <div className="col-span-1 lg:col-span-4 lg:sticky lg:top-32 pb-12 order-1 lg:order-2">
             <div className="bg-white rounded-3xl p-10 shadow-xl border border-gray-50 w-full relative">
               {/* Card Header */}
               <div className="mb-10">

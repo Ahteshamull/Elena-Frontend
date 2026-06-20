@@ -159,7 +159,7 @@ const ForgotPass = () => {
               <label className="text-sm font-bold text-primary-900">Email Address</label>
               <Input
                 type="email"
-                placeholder="name@halalhire.com"
+                placeholder="name@tableli.com"
                 icon={Mail}
                 error={emailErrors.email?.message}
                 {...registerEmail("email")}

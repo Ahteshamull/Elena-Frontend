@@ -96,7 +96,7 @@ const ManageBooking = () => {
   const chefName = chefInfo?.firstName ? `${chefInfo.firstName} ${chefInfo.lastName}` : "Chef Julian Vasseur";
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       {/* Header */}
       <div className="flex flex-col gap-6">
         <button 

@@ -346,12 +346,11 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu Drawer */}
         <div
-          className={`md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xl transition-all duration-300 ease-in-out overflow-hidden ${
+          className={`md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xl transition-all duration-300 ease-in-out ${
             menuOpen
-              ? "max-h-screen opacity-100"
-              : "max-h-0 opacity-0 pointer-events-none"
+              ? "max-h-[calc(100vh-80px)] overflow-y-auto opacity-100"
+              : "max-h-0 overflow-hidden opacity-0 pointer-events-none"
           }`}
         >
           <nav className="flex flex-col px-6 py-6 gap-1">

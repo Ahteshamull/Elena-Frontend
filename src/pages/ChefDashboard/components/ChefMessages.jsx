@@ -218,7 +218,7 @@ export default function ChefMessages() {
   ];
 
   return (
-    <div className="w-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="w-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       <div className="mb-6">
         <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">
           Messages

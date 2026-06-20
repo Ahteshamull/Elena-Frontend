@@ -11,9 +11,8 @@ export default function FeaturesSection() {
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.8 }}
-            className="order-2 lg:order-1"
+            className="order-1 lg:order-1"
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif mb-8 md:mb-12 leading-tight">
               The Standards of Global Gastronomy. In Your Home
@@ -55,11 +54,10 @@ export default function FeaturesSection() {
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.8 }}
-            className="order-1 lg:order-2"
+            className="order-2 lg:order-2 mt-8 lg:mt-0"
           >
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl">
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl w-full max-w-sm mx-auto lg:max-w-none">
               {/* Using provided local image */}
               <img 
                 src="/h_9.png" 

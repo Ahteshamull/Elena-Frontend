@@ -76,7 +76,7 @@ const ChefBookings = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">

@@ -70,7 +70,7 @@ const AuthLayout = ({ children }) => {
       {/* Global Footer */}
       <footer className="mt-auto w-full max-w-7xl pt-12 flex flex-col md:flex-row justify-between items-center border-t border-gray-100 gap-6">
         <p className="text-sm text-gray-500 font-medium">
-          © 2024 HalalHire. All rights reserved.
+          © 2024 Tableli. All rights reserved.
         </p>
         <div className="flex items-center gap-6 text-primary-900">
           <Globe size={20} className="cursor-pointer hover:opacity-70" />

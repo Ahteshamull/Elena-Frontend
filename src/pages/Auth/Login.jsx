@@ -128,7 +128,7 @@ const Login = () => {
             </label>
             <Input
               type="email"
-              placeholder="name@halalhire.com"
+              placeholder="name@tableli.com"
               icon={Mail}
               error={errors.email?.message}
               {...register("email")}

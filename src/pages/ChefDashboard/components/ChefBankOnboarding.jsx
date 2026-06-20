@@ -21,7 +21,7 @@ const ChefBankOnboarding = () => {
   const isVerified = data?.status === 'verified';
 
   return (
-    <div className="flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">Payout Settings</h1>
         <p className="text-gray-500 font-medium text-sm md:text-base">

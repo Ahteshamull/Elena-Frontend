@@ -113,7 +113,7 @@ const ChefEarnings = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
+    <div className="flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 relative pb-28 md:pb-0">
       {/* Payout Method Modal */}
       {showPayoutModal && (
         <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6">

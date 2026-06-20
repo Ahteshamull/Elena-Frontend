@@ -313,7 +313,7 @@ const Profile = () => {
   // --- Render ---
 
   return (
-    <div className="relative flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+    <div className="relative flex flex-col gap-6 md:gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">
           Account Profile

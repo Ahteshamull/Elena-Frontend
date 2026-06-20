@@ -71,7 +71,7 @@ const Payments = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+    <div className="flex flex-col gap-6 md:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">Payment Methods</h1>
         <p className="text-gray-500 font-medium text-sm md:text-base">Manage your secure payment options and billing preferences.</p>
