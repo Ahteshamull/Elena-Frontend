@@ -39,10 +39,10 @@ const Stepper = ({ currentStep }) => {
 
 const OnboardingLayout = ({ children, currentStep = 1, title = "Artisan Onboarding", wider = false, noCard = false }) => {
   return (
-    <div className="min-h-screen bg-[#F5F5F0] flex flex-col items-center pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-[#F5F5F0] flex flex-col items-center pt-24 md:pt-32 pb-10 md:pb-20 px-4 md:px-6">
       {/* Header */}
       <div className={cn(
-        "w-full flex justify-between items-center mb-12",
+        "w-full flex flex-col sm:flex-row justify-between items-center gap-6 mb-8 md:mb-12",
         wider ? "max-w-6xl" : "max-w-4xl"
       )}>
         <span className="text-sm font-bold text-primary-900 uppercase tracking-widest">{title}</span>
@@ -56,7 +56,7 @@ const OnboardingLayout = ({ children, currentStep = 1, title = "Artisan Onboardi
         </div>
       ) : (
         <div className={cn(
-          "w-full bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-16",
+          "w-full bg-white rounded-[32px] md:rounded-[40px] shadow-sm border border-gray-100 p-6 sm:p-8 md:p-16",
           wider ? "max-w-6xl" : "max-w-4xl"
         )}>
           {children}

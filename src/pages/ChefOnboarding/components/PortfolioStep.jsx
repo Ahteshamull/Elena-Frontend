@@ -37,8 +37,8 @@ const PortfolioStep = ({
       </div>
 
       {/* Section: Menu & Pricing */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-8 flex flex-col gap-10">
-        <div className="flex justify-between items-start">
+      <div className="bg-white border border-gray-100 rounded-[32px] md:rounded-3xl p-6 sm:p-8 flex flex-col gap-8 md:gap-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h3 className="text-2xl font-bold text-primary-900 mb-1">Menu & Pricing</h3>
             <p className="text-xs text-gray-400 font-medium">Define your value and signature offerings.</p>
@@ -48,7 +48,7 @@ const PortfolioStep = ({
           </Badge>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-10">
           <div className="flex flex-col gap-3">
             <label className="text-[10px] font-bold text-primary-900 tracking-widest uppercase">Starting Price per Person</label>
             <div className="relative">
@@ -191,8 +191,8 @@ const PortfolioStep = ({
       </div>
 
       {/* Section: Identity & Verification */}
-      <div className="bg-[#FAFAFA] rounded-[40px] p-8 md:p-12 flex flex-col gap-10 border border-gray-100">
-        <div className="flex items-center gap-4">
+      <div className="bg-[#FAFAFA] rounded-[32px] md:rounded-[40px] p-6 sm:p-8 md:p-12 flex flex-col gap-8 md:gap-10 border border-gray-100">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white">
             <ShieldCheck size={24} />
           </div>
@@ -203,7 +203,7 @@ const PortfolioStep = ({
         </div>
 
         <div className="flex flex-col gap-4">
-          <label className="bg-white rounded-2xl p-6 border border-gray-100 flex items-center justify-between group hover:border-accent transition-colors cursor-pointer block">
+          <label className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-accent transition-colors cursor-pointer block">
             <input 
               type="file" 
               className="hidden" 
@@ -227,7 +227,7 @@ const PortfolioStep = ({
             )}
           </label>
 
-          <label className="bg-white rounded-2xl p-6 border border-gray-100 flex items-center justify-between group hover:border-accent transition-colors cursor-pointer block">
+          <label className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-accent transition-colors cursor-pointer block">
             <input 
               type="file" 
               className="hidden" 
@@ -251,7 +251,7 @@ const PortfolioStep = ({
             )}
           </label>
 
-          <label className="bg-white rounded-2xl p-6 border-2 border-dashed border-gray-100 flex items-center justify-between group hover:border-accent transition-all cursor-pointer block">
+          <label className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-dashed border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group hover:border-accent transition-all cursor-pointer block">
             <input 
               type="file" 
               className="hidden" 

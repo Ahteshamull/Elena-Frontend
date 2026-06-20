@@ -39,7 +39,7 @@ const PersonalInfoStep = ({
         </div>
 
         {/* Profile Upload */}
-        <div className="flex items-center gap-8">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
           <div className="relative group">
             <label className="w-32 h-32 rounded-full border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors overflow-hidden relative">
               <input 
@@ -68,7 +68,7 @@ const PersonalInfoStep = ({
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-10">
+        <div className="grid md:grid-cols-2 gap-x-8 gap-y-6 md:gap-y-10">
           <div className="flex flex-col gap-3">
             <label className="text-[10px] font-bold text-primary-900 tracking-widest uppercase">Full Name</label>
             <Input 
@@ -154,7 +154,7 @@ const PersonalInfoStep = ({
           <h2 className="text-4xl font-serif text-primary-900">Professional Information</h2>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-10">
+        <div className="grid md:grid-cols-2 gap-x-8 gap-y-6 md:gap-y-10">
           <div className="flex flex-col gap-3">
             <label className="text-[10px] font-bold text-primary-900 tracking-widest uppercase">Years of Experience</label>
             <Select 

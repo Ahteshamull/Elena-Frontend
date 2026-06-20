@@ -41,12 +41,12 @@ const AvailabilityStep = ({
       </div>
 
       {/* Card 1: Service Availability */}
-      <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 p-10 md:p-12 flex flex-col gap-10">
-        <div className="flex justify-between items-start">
+      <div className="bg-white rounded-[32px] md:rounded-[40px] shadow-sm border border-gray-100 p-6 sm:p-10 md:p-12 flex flex-col gap-8 md:gap-10">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
             <h3 className="text-2xl font-bold text-primary-900 mb-2">Service Availability</h3>
           </div>
-          <div className="flex items-center gap-8">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-8">
             <div className="flex items-center gap-4">
               <span className="text-[8px] font-black text-gray-400 tracking-widest uppercase">Always Available</span>
               <Toggle 
@@ -70,7 +70,7 @@ const AvailabilityStep = ({
           </div>
         </div>
 
-        <div className="grid md:grid-cols-[auto,1fr] gap-16">
+        <div className="grid md:grid-cols-[auto,1fr] gap-8 md:gap-16">
           <div className="relative">
             <Calendar 
               selectedDates={availableDates}
@@ -150,7 +150,7 @@ const AvailabilityStep = ({
       </div>
 
       {/* Card 2: Platform Terms & Escrow */}
-      <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 p-10 md:p-12 flex flex-col gap-10">
+      <div className="bg-white rounded-[32px] md:rounded-[40px] shadow-sm border border-gray-100 p-6 sm:p-10 md:p-12 flex flex-col gap-8 md:gap-10">
         <h3 className="text-2xl font-bold text-primary-900">Platform Terms & Escrow</h3>
         
         <div className="bg-[#F8F9FA] rounded-3xl p-8 max-h-[320px] overflow-y-auto border border-gray-100 custom-scrollbar">
