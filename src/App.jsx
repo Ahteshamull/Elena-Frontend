@@ -28,10 +28,13 @@ import Careers from './pages/Support/Careers';
 import Booking from './pages/Booking/Booking';
 import Checkout from './pages/Checkout/Checkout';
 import PaymentSuccess from './pages/Checkout/PaymentSuccess';
+import PaymentCancel from './pages/Checkout/PaymentCancel';
 import Messages from './pages/Messages/Messages';
 import { VerifyEmail } from './pages/Auth/VerifyEmail';
 import CancellationPolicy from './pages/Support/cancellation';
 import ProtectedRoute from './components/layout/ProtectedRoute';
+import StripeRefresh from './pages/ChefOnboarding/StripeRefresh';
+import StripeReturn from './pages/ChefOnboarding/StripeReturn';
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -75,6 +78,21 @@ function App() {
             <Route path="/payment/success" element={
               <ProtectedRoute>
                 <PaymentSuccess />
+              </ProtectedRoute>
+            } />
+            <Route path="/payment/cancel" element={
+              <ProtectedRoute>
+                <PaymentCancel />
+              </ProtectedRoute>
+            } />
+            <Route path="/stripe-refresh" element={
+              <ProtectedRoute>
+                <StripeRefresh />
+              </ProtectedRoute>
+            } />
+            <Route path="/stripe-return" element={
+              <ProtectedRoute>
+                <StripeReturn />
               </ProtectedRoute>
             } />
             <Route path="/messages" element={
