@@ -153,6 +153,7 @@ const PortfolioStep = ({
             icon={CloudUpload}
             className="bg-white"
             accept="image/*"
+            multiple={true}
             selectedFile={dishPhotography}
             onFileSelect={setDishPhotography}
           />
@@ -162,6 +163,7 @@ const PortfolioStep = ({
             icon={LayoutGrid}
             className="bg-white"
             accept="image/*"
+            multiple={true}
             selectedFile={eventHighlights}
             onFileSelect={setEventHighlights}
           />

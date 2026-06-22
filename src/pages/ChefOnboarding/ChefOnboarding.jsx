@@ -206,8 +206,22 @@ const ChefOnboarding = () => {
       if (cv) submitFormData.append('cv', cv);
       if (governmentId) submitFormData.append('governmentId', governmentId);
       if (foodSafetyCertificate) submitFormData.append('foodSafetyCertificate', foodSafetyCertificate);
-      if (dishPhotography) submitFormData.append('dishPhotography', dishPhotography);
-      if (eventHighlights) submitFormData.append('eventHighlights', eventHighlights);
+      
+      if (dishPhotography) {
+        if (Array.isArray(dishPhotography)) {
+          dishPhotography.forEach(file => submitFormData.append('dishPhotography', file));
+        } else {
+          submitFormData.append('dishPhotography', dishPhotography);
+        }
+      }
+      
+      if (eventHighlights) {
+        if (Array.isArray(eventHighlights)) {
+          eventHighlights.forEach(file => submitFormData.append('eventHighlights', file));
+        } else {
+          submitFormData.append('eventHighlights', eventHighlights);
+        }
+      }
 
       try {
         const response = await setupProfile(submitFormData).unwrap();

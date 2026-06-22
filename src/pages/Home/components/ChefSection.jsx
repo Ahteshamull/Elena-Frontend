@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "../../../components/ui/Card";
@@ -6,8 +6,25 @@ import { Button } from "../../../components/ui/Button";
 import { useGetAllUsersQuery } from "../../../redux/api/userApi";
 
 export default function ChefSection() {
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        setLoggedInUser(JSON.parse(userStr));
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
+
   const { data, isLoading } = useGetAllUsersQuery({ role: "chef", limit: 3 });
   const displayChefs = data?.data || [];
+
+  if (loggedInUser?.role === "chef") {
+    return null;
+  }
 
   return (
     <section

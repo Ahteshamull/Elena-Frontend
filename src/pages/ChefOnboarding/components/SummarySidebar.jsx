@@ -16,7 +16,7 @@ const SummarySidebar = ({
   ];
 
   return (
-    <div className="flex flex-col gap-8 lg:sticky lg:top-32 h-fit mt-[180px]">
+    <div className="flex flex-col gap-8 lg:sticky lg:top-32 h-fit mt-[30px]">
       <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 flex flex-col gap-8">
         <h3 className="text-xl font-bold text-primary-900">Onboarding Summary</h3>
         

@@ -154,12 +154,22 @@ export default function Messages() {
       }
     };
 
+    const handleAuthError = (payload) => {
+      console.error("Socket auth error:", payload);
+    };
+
+    const handleSocketError = (payload) => {
+      console.error("Socket error:", payload);
+    };
+
     socket.on("new-message", handleNewMessage);
     socket.on("single-message-sent", handleMessageSent);
     socket.on("new-message-notification", handleNotification);
     socket.on("user-typing", handleUserTyping);
     socket.on("user-stop-typing", handleUserStopTyping);
     socket.on("messages-marked-read", handleMessagesRead);
+    socket.on("auth-error", handleAuthError);
+    socket.on("socket-error", handleSocketError);
 
     return () => {
       socket.off("new-message", handleNewMessage);
@@ -168,6 +178,8 @@ export default function Messages() {
       socket.off("user-typing", handleUserTyping);
       socket.off("user-stop-typing", handleUserStopTyping);
       socket.off("messages-marked-read", handleMessagesRead);
+      socket.off("auth-error", handleAuthError);
+      socket.off("socket-error", handleSocketError);
     };
   }, [
     socket,
@@ -425,12 +437,12 @@ export default function Messages() {
                 </div>
 
                 <div className="flex items-center gap-4 text-[#C1BE64]">
-                  <button className="hover:opacity-80 transition-opacity">
+                  {/* <button className="hover:opacity-80 transition-opacity">
                     <Phone size={20} />
                   </button>
                   <button className="hover:opacity-80 transition-opacity">
                     <Video size={20} />
-                  </button>
+                  </button> */}
                   <button className="text-gray-400 hover:text-gray-600 transition-colors ml-2">
                     <MoreVertical size={20} />
                   </button>

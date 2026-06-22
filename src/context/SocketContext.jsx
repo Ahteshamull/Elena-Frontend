@@ -8,18 +8,36 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [userId, setUserId] = useState(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    return user?.id || user?._id;
+  });
 
-  // Get user from local storage safely
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      const currentId = user?.id || user?._id;
+      if (currentId !== userId) {
+        setUserId(currentId);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [userId]);
 
   useEffect(() => {
     // Only connect if user exists
-    const userId = user?.id || user?._id;
-    if (!userId) return;
+    if (!userId) {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+        setIsConnected(false);
+      }
+      return;
+    }
 
-    // Use environment variable or fallback to local backend port
-    const backendUrl =
-      import.meta.env.VITE_BASE_URL;
+    // Use environment variable and strip the /api/v1 path for socket connection
+    const baseUrl = import.meta.env.VITE_BASE_URL || "";
+    const backendUrl = baseUrl.replace(/\/api\/v1\/?$/, "");
 
     const socketInstance = io(backendUrl, {
       query: { id: userId },
@@ -43,7 +61,7 @@ export const SocketProvider = ({ children }) => {
     return () => {
       socketInstance.disconnect();
     };
-  }, [user?._id]);
+  }, [userId]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

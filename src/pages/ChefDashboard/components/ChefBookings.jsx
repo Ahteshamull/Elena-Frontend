@@ -154,12 +154,17 @@ const ChefBookings = () => {
               ? `$${booking.bookingDetails.totalAmount}`
               : "TBD";
 
-            const rawImage = clientInfo.image;
-            const image = rawImage
-              ? rawImage.startsWith("http")
-                ? rawImage
-                : `${import.meta.env.VITE_BASE_URL}${rawImage}`
-              : "";
+            const rawImage = clientInfo?.image;
+            let image = "";
+            if (rawImage) {
+              if (rawImage.startsWith("http")) {
+                image = rawImage;
+              } else {
+                const baseUrl = import.meta.env.VITE_BASE_URL?.replace(/\/+$/, "") || "";
+                const cleanPath = rawImage.replace(/\\/g, "/").replace(/^\/+/, "");
+                image = `${baseUrl}/${cleanPath}`;
+              }
+            }
 
             return (
               <Card
@@ -170,11 +175,23 @@ const ChefBookings = () => {
                   <div className="flex items-center gap-6 w-full md:w-auto">
                     <div className="relative">
                       {image ? (
-                        <img
-                          src={image}
-                          alt={client}
-                          className="w-20 h-20 rounded-2xl object-cover ring-2 ring-gray-50 group-hover:ring-accent/20 transition-all"
-                        />
+                        <>
+                          <img
+                            src={image}
+                            alt={client}
+                            className="w-20 h-20 rounded-2xl object-cover ring-2 ring-gray-50 group-hover:ring-accent/20 transition-all"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                          <div 
+                            className="w-20 h-20 rounded-2xl bg-gray-100 items-center justify-center text-gray-500 font-bold text-2xl ring-2 ring-gray-50 group-hover:ring-accent/20 transition-all uppercase hidden"
+                          >
+                            {client ? client.charAt(0) : "?"}
+                          </div>
+                        </>
                       ) : (
                         <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-2xl ring-2 ring-gray-50 group-hover:ring-accent/20 transition-all uppercase">
                           {client ? client.charAt(0) : "?"}

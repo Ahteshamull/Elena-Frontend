@@ -20,7 +20,7 @@ import {
 
 export default function ChefMessages() {
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
-  const { socket, isConnected } = useSocket();
+  const { socket, isConnected } = useSocket() || {};
 
   const [activeConvId, setActiveConvId] = useState(null);
   const [inputText, setInputText] = useState("");
@@ -90,10 +90,24 @@ export default function ChefMessages() {
       }
     };
 
+    const handleAuthError = (payload) => {
+      console.error("Socket auth error:", payload);
+      showToast(payload?.message || "Authentication error.");
+    };
+
+    const handleSocketError = (payload) => {
+      console.error("Socket error:", payload);
+      showToast(payload?.message || "Chat server error.");
+    };
+
     socket.on("new-message", handleNewMessage);
+    socket.on("auth-error", handleAuthError);
+    socket.on("socket-error", handleSocketError);
 
     return () => {
       socket.off("new-message", handleNewMessage);
+      socket.off("auth-error", handleAuthError);
+      socket.off("socket-error", handleSocketError);
     };
   }, [socket, activeConvId, refetchConvs]);
 
@@ -131,15 +145,6 @@ export default function ChefMessages() {
     if (!textToSend) {
       setInputText("");
     }
-
-    // Optimistic update
-    const tempMsg = {
-      _id: Date.now().toString(),
-      senderId: currentUser,
-      text: text,
-      createdAt: new Date().toISOString(),
-    };
-    setLocalMessages((prev) => [...prev, tempMsg]);
   };
 
   const handleKeyDown = (e) => {
@@ -174,11 +179,16 @@ export default function ChefMessages() {
         participant?.name ||
         "Client";
       const rawImage = profile.image || participant?.image;
-      const image = rawImage
-        ? rawImage.startsWith("http")
-          ? rawImage
-          : `${import.meta.env.VITE_BASE_URL}${rawImage}`
-        : "/b_1.png";
+      let image = null;
+      if (rawImage) {
+        if (rawImage.startsWith("http")) {
+          image = rawImage;
+        } else {
+          const baseUrl = import.meta.env.VITE_BASE_URL?.replace(/\/+$/, "") || "";
+          const cleanPath = rawImage.replace(/\\/g, "/").replace(/^\/+/, "");
+          image = `${baseUrl}/${cleanPath}`;
+        }
+      }
 
       const unreadCount = conv.unreadCount || 0;
 
@@ -219,17 +229,17 @@ export default function ChefMessages() {
 
   return (
     <div className="w-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700 pb-28 md:pb-0">
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-4xl font-serif text-primary-900 italic">
+      <div className="mb-4 md:mb-8 mt-2">
+        <h1 className="text-2xl md:text-4xl font-serif text-primary-900 mb-1 md:mb-2 tracking-tight">
           Messages
         </h1>
-        <p className="text-gray-500 font-medium text-sm md:text-base">
+        <p className="text-gray-500 font-medium text-xs md:text-base">
           Coordinate dinner menus, ingredient updates, and arrival timings with
           your booked clients.
         </p>
       </div>
 
-      <div className="h-[500px] md:h-[calc(100vh-14rem)] bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex">
+      <div className="h-[calc(100vh-17rem)] md:h-[calc(100vh-14rem)] bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex">
         <div
           className={cn(
             "w-full md:w-80 lg:w-96 border-r border-gray-100 flex flex-col bg-white shrink-0 transition-all duration-300 h-full overflow-hidden",
@@ -272,13 +282,23 @@ export default function ChefMessages() {
                     )}
                   >
                     <div className="relative shrink-0">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border border-white shadow-sm bg-gray-100 flex items-center justify-center font-bold text-gray-400 uppercase text-xl">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-white shadow-sm bg-gray-100 flex items-center justify-center font-bold text-gray-400 uppercase text-xl shrink-0">
                         {chat.clientImage && chat.clientImage !== "/b_1.png" ? (
-                          <img
-                            src={chat.clientImage}
-                            alt={chat.clientName}
-                            className="w-full h-full object-cover"
-                          />
+                          <>
+                            <img
+                              src={chat.clientImage}
+                              alt={chat.clientName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                            <div className="hidden w-full h-full items-center justify-center">
+                              {chat.clientName.charAt(0)}
+                            </div>
+                          </>
                         ) : (
                           chat.clientName.charAt(0)
                         )}
@@ -345,14 +365,24 @@ export default function ChefMessages() {
                   <ChevronLeft size={20} />
                 </button>
                 <div className="relative">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center font-bold text-gray-400 uppercase text-lg">
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center font-bold text-gray-400 uppercase text-lg shrink-0">
                     {activeChat.clientImage &&
                     activeChat.clientImage !== "/b_1.png" ? (
-                      <img
-                        src={activeChat.clientImage}
-                        alt={activeChat.clientName}
-                        className="w-full h-full object-cover"
-                      />
+                      <>
+                        <img
+                          src={activeChat.clientImage}
+                          alt={activeChat.clientName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div className="hidden w-full h-full items-center justify-center">
+                          {activeChat.clientName.charAt(0)}
+                        </div>
+                      </>
                     ) : (
                       activeChat.clientName.charAt(0)
                     )}
@@ -413,8 +443,9 @@ export default function ChefMessages() {
                 </div>
               ) : (
                 localMessages.map((msg) => {
+                  const actualUser = currentUser?.data || currentUser || {};
                   const currentUserId = String(
-                    currentUser?._id || currentUser?.id || "",
+                    actualUser?._id || actualUser?.id || "",
                   );
                   const msgSenderId = String(
                     msg.senderId?._id || msg.senderId?.id || msg.senderId || "",
@@ -433,11 +464,21 @@ export default function ChefMessages() {
                         <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-100 shadow-sm border border-white flex items-center justify-center font-bold text-gray-400 uppercase text-xs">
                           {activeChat.clientImage &&
                           activeChat.clientImage !== "/b_1.png" ? (
-                            <img
-                              src={activeChat.clientImage}
-                              alt={activeChat.clientName}
-                              className="w-full h-full object-cover"
-                            />
+                            <>
+                              <img
+                                src={activeChat.clientImage}
+                                alt={activeChat.clientName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                              <div className="hidden w-full h-full items-center justify-center">
+                                {activeChat.clientName.charAt(0)}
+                              </div>
+                            </>
                           ) : (
                             activeChat.clientName.charAt(0)
                           )}

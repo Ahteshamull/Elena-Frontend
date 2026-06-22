@@ -30,7 +30,7 @@ import {
 
 export default function Messages() {
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
-  const { socket, isConnected } = useSocket();
+  const { socket, isConnected } = useSocket() || {};
   const [searchParams, setSearchParams] = useSearchParams();
 
   const initialConvId = searchParams.get("convId");
@@ -171,15 +171,6 @@ export default function Messages() {
     if (!textToSend) {
       setInputText("");
     }
-
-    // Optimistic update
-    const tempMsg = {
-      _id: Date.now().toString(),
-      senderId: currentUser,
-      text: text,
-      createdAt: new Date().toISOString(),
-    };
-    setLocalMessages((prev) => [...prev, tempMsg]);
   };
 
   const handleKeyDown = (e) => {
@@ -214,11 +205,17 @@ export default function Messages() {
         participant?.name ||
         "User";
       const rawImage = profile.image || participant?.image;
-      const image = rawImage
-        ? rawImage.startsWith("http")
-          ? rawImage
-          : `${import.meta.env.VITE_BASE_URL}${rawImage}`
-        : "/b_1.png";
+      
+      let image = null;
+      if (rawImage) {
+        if (rawImage.startsWith("http")) {
+          image = rawImage;
+        } else {
+          const baseUrl = import.meta.env.VITE_BASE_URL?.replace(/\/+$/, "") || "";
+          const cleanPath = rawImage.replace(/\\/g, "/").replace(/^\/+/, "");
+          image = `${baseUrl}/${cleanPath}`;
+        }
+      }
 
       // check unread count where reader array doesn't contain current user
       const unreadCount = conv.unreadCount || 0;
@@ -256,16 +253,16 @@ export default function Messages() {
   ];
 
   return (
-    <div className="w-full flex flex-col">
-      <div className="mb-6">
-        <h1 className="text-3xl font-serif text-primary-900 mb-1">Messages</h1>
-        <p className="text-gray-500 text-sm">
+    <div className="w-full flex flex-col pb-24 md:pb-0">
+      <div className="mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl font-serif text-primary-900 mb-1">Messages</h1>
+        <p className="text-gray-500 text-xs md:text-sm">
           Coordinate menus, schedules, and logistics directly with your booked
           private chefs.
         </p>
       </div>
 
-      <div className="h-[500px] md:h-[calc(100vh-14rem)] bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex">
+      <div className="h-[calc(100vh-16rem)] md:h-[calc(100vh-14rem)] bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex">
         <div
           className={cn(
             "w-full md:w-80 lg:w-96 border-r border-gray-100 flex flex-col bg-white shrink-0 transition-all duration-300 h-full overflow-hidden",
@@ -308,12 +305,25 @@ export default function Messages() {
                     )}
                   >
                     <div className="relative shrink-0">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border border-white shadow-sm bg-gray-100">
-                        <img
-                          src={chat.chefImage}
-                          alt={chat.chefName}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="w-12 h-12 rounded-full overflow-hidden border border-white shadow-sm bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg shrink-0">
+                        {chat.chefImage ? (
+                          <img
+                            src={chat.chefImage}
+                            alt={chat.chefName}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="w-full h-full flex items-center justify-center" 
+                          style={{ display: chat.chefImage ? 'none' : 'flex' }}
+                        >
+                          {chat.chefName?.charAt(0).toUpperCase() || <ChefHat size={20} />}
+                        </div>
                       </div>
                       {chat.status === "online" && (
                         <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
@@ -371,12 +381,25 @@ export default function Messages() {
                   <ChevronLeft size={20} />
                 </button>
                 <div className="relative">
-                  <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 bg-gray-50">
-                    <img
-                      src={activeChat.chefImage}
-                      alt={activeChat.chefName}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-11 h-11 rounded-full overflow-hidden border border-gray-100 bg-gray-50 flex items-center justify-center text-gray-500 font-bold text-lg shrink-0">
+                    {activeChat.chefImage ? (
+                      <img
+                        src={activeChat.chefImage}
+                        alt={activeChat.chefName}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <div 
+                      className="w-full h-full flex items-center justify-center" 
+                      style={{ display: activeChat.chefImage ? 'none' : 'flex' }}
+                    >
+                      {activeChat.chefName?.charAt(0).toUpperCase() || <ChefHat size={20} />}
+                    </div>
                   </div>
                 </div>
 
@@ -434,8 +457,9 @@ export default function Messages() {
                 </div>
               ) : (
                 localMessages.map((msg) => {
+                  const actualUser = currentUser?.data || currentUser || {};
                   const currentUserId = String(
-                    currentUser?._id || currentUser?.id || "",
+                    actualUser?._id || actualUser?.id || "",
                   );
                   const msgSenderId = String(
                     msg.senderId?._id || msg.senderId?.id || msg.senderId || "",
@@ -451,12 +475,25 @@ export default function Messages() {
                       )}
                     >
                       {!isMe && (
-                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-100 shadow-sm border border-white">
-                          <img
-                            src={activeChat.chefImage}
-                            alt={activeChat.chefName}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-100 shadow-sm border border-white flex items-center justify-center text-gray-500 font-bold text-sm">
+                          {activeChat.chefImage ? (
+                            <img
+                              src={activeChat.chefImage}
+                              alt={activeChat.chefName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div 
+                            className="w-full h-full flex items-center justify-center" 
+                            style={{ display: activeChat.chefImage ? 'none' : 'flex' }}
+                          >
+                            {activeChat.chefName?.charAt(0).toUpperCase() || "C"}
+                          </div>
                         </div>
                       )}
 

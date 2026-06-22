@@ -170,8 +170,7 @@ export default function ChefProfile() {
           {/* Hero Image (Left) */}
           <div className="w-full lg:w-7/12 shrink-0">
             <div
-              className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100 flex items-center justify-center text-gray-400"
-              style={{ aspectRatio: "3/2", minHeight: "400px" }}
+              className="relative rounded-3xl overflow-hidden shadow-2xl bg-gray-100 flex items-center justify-center text-gray-400 aspect-[4/3] md:aspect-[3/2]"
             >
               {image ? (
                 <img
@@ -187,13 +186,13 @@ export default function ChefProfile() {
 
           {/* Hero Content (Right) */}
           <div className="w-full lg:w-5/12 flex flex-col items-start lg:pt-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#D4AF37] mb-5">
+            <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#D4AF37] mb-4 md:mb-5">
               VERIFIED MASTER CHEF
             </span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-gray-900 mb-4 leading-tight capitalize">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-gray-900 mb-3 md:mb-4 leading-tight capitalize">
               {fullName}
             </h1>
-            <h2 className="text-2xl md:text-3xl font-serif italic text-gray-500 mb-8 font-light capitalize">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-serif italic text-gray-500 mb-6 md:mb-8 font-light capitalize">
               {specialty}
             </h2>
 
@@ -213,49 +212,51 @@ export default function ChefProfile() {
               </div>
             </div>
 
-            <p className="text-gray-500 leading-relaxed max-w-lg mb-12 text-lg font-light">
+            <p className="text-gray-500 leading-relaxed max-w-lg mb-8 md:mb-12 text-base md:text-lg font-light">
               {aboutMe}
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="flex flex-col sm:flex-row items-center gap-10">
-                <Link to={`/book/${id}`}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-10 w-full sm:w-auto">
+                <Link to={`/book/${id}`} className="w-full sm:w-auto">
                   <Button
                     variant="primary"
-                    className="bg-black text-white px-10 py-5 rounded-lg text-xs font-bold tracking-widest uppercase shadow-xl hover:bg-gray-800 transition-all"
+                    className="w-full sm:w-auto bg-black text-white px-8 md:px-10 py-4 md:py-5 rounded-lg text-xs font-bold tracking-widest uppercase shadow-xl hover:bg-gray-800 transition-all"
                   >
                     BOOK CHEF {fullName.split(" ")[0].toUpperCase()}
                   </Button>
                 </Link>
-                <button
-                  onClick={handleMessageChef}
-                  disabled={isCreatingChat}
-                  className="group text-xs font-bold uppercase tracking-widest text-gray-900 flex items-center gap-3 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  <span className="border-b border-transparent group-hover:border-gray-900 pb-1">
-                    {isCreatingChat
-                      ? "Starting Chat..."
-                      : `Message ${fullName.split(" ")[0]}`}
-                  </span>
-                  <span className="text-lg transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </button>
-              </div>
+                <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-4">
+                  <button
+                    onClick={handleMessageChef}
+                    disabled={isCreatingChat}
+                    className="group text-xs font-bold uppercase tracking-widest text-gray-900 flex items-center gap-2 md:gap-3 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span className="border-b border-transparent group-hover:border-gray-900 pb-1">
+                      {isCreatingChat
+                        ? "Starting Chat..."
+                        : `Message ${fullName.split(" ")[0]}`}
+                    </span>
+                    <span className="text-lg transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
+                  </button>
 
-              <button
-                onClick={handleToggleFavorite}
-                className="w-12 h-12 sm:ml-4 rounded-full border border-gray-200 flex items-center justify-center text-red-500 shadow-sm hover:bg-gray-50 transition-colors"
-                title={
-                  isFavorite ? "Remove from favorites" : "Add to favorites"
-                }
-              >
-                <Heart
-                  size={20}
-                  fill={isFavorite ? "currentColor" : "none"}
-                  strokeWidth={isFavorite ? 0 : 2}
-                />
-              </button>
+                  <button
+                    onClick={handleToggleFavorite}
+                    className="w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-red-500 shadow-sm hover:bg-gray-50 transition-colors"
+                    title={
+                      isFavorite ? "Remove from favorites" : "Add to favorites"
+                    }
+                  >
+                    <Heart
+                      size={20}
+                      fill={isFavorite ? "currentColor" : "none"}
+                      strokeWidth={isFavorite ? 0 : 2}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -267,13 +268,13 @@ export default function ChefProfile() {
           {/* Left Column: Main Content (8 cols) */}
           <div className="col-span-1 lg:col-span-8 flex flex-col order-2 lg:order-1">
             {/* Navigation Tabs */}
-            <div className="sticky top-0 z-20 bg-[#FAFAFA]/95 backdrop-blur-md pt-4 pb-6 border-b border-gray-100 mb-16 flex gap-12 overflow-x-auto no-scrollbar">
+            <div className="sticky top-0 z-20 bg-[#FAFAFA]/95 backdrop-blur-md pt-4 pb-4 md:pb-6 border-b border-gray-100 mb-10 md:mb-16 flex gap-6 md:gap-12 overflow-x-auto no-scrollbar">
               {["BIOGRAPHY", "SIGNATURE MENUS", "GALLERY", "REVIEWS"].map(
                 (tab) => (
                   <button
                     key={tab}
                     onClick={() => scrollToSection(tab)}
-                    className={`text-xs font-bold uppercase tracking-widest whitespace-nowrap pb-3 border-b-2 transition-all duration-300 ${
+                    className={`text-[10px] md:text-xs font-bold uppercase tracking-widest whitespace-nowrap pb-2 md:pb-3 border-b-2 transition-all duration-300 ${
                       activeTab === tab
                         ? "border-[#D4AF37] text-gray-900"
                         : "border-transparent text-gray-400 hover:text-gray-600"
@@ -286,22 +287,22 @@ export default function ChefProfile() {
             </div>
 
             {/* Biography Section */}
-            <div id="biography" className="mb-24">
-              <h3 className="text-4xl font-serif text-gray-900 mb-10 leading-tight">
+            <div id="biography" className="mb-16 md:mb-24 scroll-mt-32">
+              <h3 className="text-3xl md:text-4xl font-serif text-gray-900 mb-6 md:mb-10 leading-tight">
                 The Culinary Journey
               </h3>
-              <div className="flex flex-col gap-8 text-gray-500 leading-relaxed text-base font-light max-w-3xl whitespace-pre-wrap">
+              <div className="flex flex-col gap-6 md:gap-8 text-gray-500 leading-relaxed text-sm md:text-base font-light max-w-3xl whitespace-pre-wrap">
                 <p>{aboutMe}</p>
               </div>
 
               {/* Badges Row - Showing Languages and Specialties dynamically */}
-              <div className="flex flex-wrap gap-4 mt-12">
+              <div className="flex flex-wrap gap-3 md:gap-4 mt-8 md:mt-12">
                 {profileResponse.languages?.map((lang) => (
                   <div
                     key={lang}
-                    className="flex items-center gap-3 bg-gray-100 px-6 py-4 rounded-2xl border border-white transition-all hover:bg-white hover:shadow-md"
+                    className="flex items-center gap-2 md:gap-3 bg-gray-100 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl border border-white transition-all hover:bg-white hover:shadow-md"
                   >
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-700">
+                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-700">
                       {lang}
                     </span>
                   </div>
@@ -309,9 +310,9 @@ export default function ChefProfile() {
                 {profileResponse.cuisineSpecialties?.map((spec) => (
                   <div
                     key={spec}
-                    className="flex items-center gap-3 bg-gray-100 px-6 py-4 rounded-2xl border border-white transition-all hover:bg-white hover:shadow-md"
+                    className="flex items-center gap-2 md:gap-3 bg-gray-100 px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl border border-white transition-all hover:bg-white hover:shadow-md"
                   >
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-700">
+                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-700">
                       {spec}
                     </span>
                   </div>
@@ -322,11 +323,11 @@ export default function ChefProfile() {
             {/* Signature Menus Section */}
             <div
               id="menus"
-              className="mb-24 border-t border-gray-100"
-              style={{ paddingTop: "100px" }}
+              className="mb-16 md:mb-24 border-t border-gray-100 scroll-mt-32"
+              style={{ paddingTop: "60px" }}
             >
-              <div className="flex flex-col sm:flex-row justify-between items-baseline mb-12 gap-4">
-                <h3 className="text-4xl font-serif text-gray-900 leading-tight">
+              <div className="flex flex-col sm:flex-row justify-between items-baseline mb-8 md:mb-12 gap-4">
+                <h3 className="text-3xl md:text-4xl font-serif text-gray-900 leading-tight">
                   Signature Menus
                 </h3>
               </div>
@@ -383,50 +384,30 @@ export default function ChefProfile() {
             {/* Culinary Gallery Section */}
             <div
               id="gallery"
-              className="mb-24 border-t border-gray-100"
-              style={{ paddingTop: "100px" }}
+              className="mb-16 md:mb-24 border-t border-gray-100 scroll-mt-32"
+              style={{ paddingTop: "60px" }}
             >
-              <h3 className="text-4xl font-serif text-gray-900 mb-12 leading-tight">
+              <h3 className="text-3xl md:text-4xl font-serif text-gray-900 mb-8 md:mb-12 leading-tight">
                 Culinary Gallery
               </h3>
 
-              {/* Gallery Grid */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    finalGallery.length > 2 ? "2fr 1fr 1fr" : "1fr 1fr",
-                  gridAutoRows: "340px",
-                  gap: "16px",
-                }}
-              >
+              {/* Gallery Slider */}
+              <div className="flex overflow-x-auto gap-4 md:gap-6 pb-6 md:pb-8 snap-x snap-mandatory no-scrollbar cursor-grab active:cursor-grabbing">
                 {finalGallery.length > 0 ? (
-                  finalGallery.slice(0, 4).map((img, idx) => {
-                    // Dynamically set grid columns to replicate the asymmetric layout
-                    let gridColumn = "span 1";
-                    if (finalGallery.length >= 3) {
-                      if (idx === 0) gridColumn = "1 / 3"; // top left
-                      if (idx === 1) gridColumn = "3"; // top right
-                      if (idx === 2) gridColumn = "1"; // bottom left
-                      if (idx === 3) gridColumn = "2 / 4"; // bottom right
-                    }
-
-                    return (
-                      <div
-                        key={idx}
-                        className="rounded-2xl overflow-hidden shadow-lg"
-                        style={{ gridColumn }}
-                      >
-                        <img
-                          src={img}
-                          alt={`Gallery ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    );
-                  })
+                  finalGallery.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="min-w-full sm:min-w-[400px] h-[300px] sm:h-[400px] rounded-2xl md:rounded-3xl overflow-hidden shadow-sm flex-shrink-0 snap-start relative group"
+                    >
+                      <img
+                        src={img}
+                        alt={`Gallery ${idx + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    </div>
+                  ))
                 ) : (
-                  <p className="text-gray-500 font-light">
+                  <p className="text-gray-500 font-light px-2">
                     No gallery images provided.
                   </p>
                 )}
@@ -436,10 +417,10 @@ export default function ChefProfile() {
             {/* Guest Reflections Section */}
             <div
               id="reviews"
-              className="mb-24 border-t border-gray-100"
-              style={{ paddingTop: "100px" }}
+              className="mb-16 md:mb-24 border-t border-gray-100 scroll-mt-32"
+              style={{ paddingTop: "60px" }}
             >
-              <h3 className="text-4xl font-serif text-gray-900 mb-12 leading-tight">
+              <h3 className="text-3xl md:text-4xl font-serif text-gray-900 mb-8 md:mb-12 leading-tight">
                 Guest Reflections
               </h3>
 
