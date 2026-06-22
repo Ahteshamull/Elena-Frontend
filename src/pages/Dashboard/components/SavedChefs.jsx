@@ -83,7 +83,7 @@ const SavedChefs = () => {
             const image = rawImage
               ? rawImage.startsWith("http")
                 ? rawImage
-                : `https://api.tableli.com${rawImage}`
+                : `${import.meta.env.VITE_BASE_URL}${rawImage}`
               : "/b_1.png";
 
             const isVerified = chefUser.isVerify;

@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
 
     // Use environment variable or fallback to local backend port
     const backendUrl =
-      import.meta.env.VITE_BACKEND_URL || "https://api.tableli.com";
+      import.meta.env.VITE_BASE_URL;
 
     const socketInstance = io(backendUrl, {
       query: { id: userId },

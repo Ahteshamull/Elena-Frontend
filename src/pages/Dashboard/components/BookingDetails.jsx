@@ -68,8 +68,8 @@ const BookingDetails = () => {
       return "https://images.unsplash.com/photo-1583394293214-28dea15ee548?auto=format&fit=crop&q=80&w=200";
     if (url.startsWith("http")) return url;
     return url.startsWith("/")
-      ? `https://api.tableli.com${url}`
-      : `https://api.tableli.com/${url}`;
+      ? `${import.meta.env.VITE_BASE_URL}${url}`
+      : `${import.meta.env.VITE_BASE_URL}/${url}`;
   };
 
   // Calculate generic payment details based on totalAmount

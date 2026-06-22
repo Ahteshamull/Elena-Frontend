@@ -70,7 +70,7 @@ const ChefMenus = () => {
       courses: menu.numberOfCourse,
       imagePreview: menu.menuImage?.startsWith("http")
         ? menu.menuImage
-        : `https://api.tableli.com${menu.menuImage}`,
+        : `${import.meta.env.VITE_BASE_URL}${menu.menuImage}`,
       imageFile: null,
     });
     setIsEditing(true);
@@ -366,7 +366,7 @@ const ChefMenus = () => {
                   src={
                     menu.menuImage?.startsWith("http")
                       ? menu.menuImage
-                      : `https://api.tableli.com${menu.menuImage}`
+                      : `${import.meta.env.VITE_BASE_URL}${menu.menuImage}`
                   }
                   alt={menu.menuTitle}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"

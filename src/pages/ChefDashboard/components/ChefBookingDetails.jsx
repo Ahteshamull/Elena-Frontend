@@ -67,8 +67,8 @@ const ChefBookingDetails = () => {
     if (!url || url === "undefined" || url === "null") return "";
     if (url.startsWith("http")) return url;
     return url.startsWith("/")
-      ? `https://api.tableli.com${url}`
-      : `https://api.tableli.com/${url}`;
+      ? `${import.meta.env.VITE_BASE_URL}${url}`
+      : `${import.meta.env.VITE_BASE_URL}/${url}`;
   };
 
   const clientName =

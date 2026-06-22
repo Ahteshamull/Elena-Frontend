@@ -217,7 +217,7 @@ const ChefProfileSettings = () => {
     if (!url) return null;
     if (url.startsWith("http") || url.startsWith("blob:")) return url;
     // Assuming backend is at localhost:8005
-    return `https://api.tableli.com${url}`;
+    return `${import.meta.env.VITE_BASE_URL}${url}`;
   };
 
   const handleAddCuisine = () => {

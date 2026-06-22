@@ -207,7 +207,7 @@ export default function BrowseChefs() {
                 const image = rawImage
                   ? rawImage.startsWith("http")
                     ? rawImage
-                    : `https://api.tableli.com${rawImage}`
+                    : `${import.meta.env.VITE_BASE_URL}${rawImage}`
                   : "/b_1.png";
 
                 const rating = Number(user.averageRating).toFixed(1) || "5.0";

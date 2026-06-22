@@ -177,7 +177,7 @@ export default function ChefMessages() {
       const image = rawImage
         ? rawImage.startsWith("http")
           ? rawImage
-          : `https://api.tableli.com${rawImage}`
+          : `${import.meta.env.VITE_BASE_URL}${rawImage}`
         : "/b_1.png";
 
       const unreadCount = conv.unreadCount || 0;

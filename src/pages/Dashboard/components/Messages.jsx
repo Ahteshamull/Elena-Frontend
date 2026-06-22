@@ -217,7 +217,7 @@ export default function Messages() {
       const image = rawImage
         ? rawImage.startsWith("http")
           ? rawImage
-          : `https://api.tableli.com${rawImage}`
+          : `${import.meta.env.VITE_BASE_URL}${rawImage}`
         : "/b_1.png";
 
       // check unread count where reader array doesn't contain current user
