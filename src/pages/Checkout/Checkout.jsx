@@ -4,12 +4,13 @@ import { useCreateCheckoutSessionMutation } from '../../redux/api/paymentApi';
 import { Button } from '../../components/ui/Button';
 import { toast } from 'react-toastify';
 import { ArrowLeft } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Checkout() {
   const { bookingId } = useParams();
   const { data: response, isLoading, error } = useGetBookingDetailsQuery(bookingId);
   const [createCheckoutSession, { isLoading: isPaying }] = useCreateCheckoutSessionMutation();
+  const [paymentType, setPaymentType] = useState('full');
 
   const booking = response?.data;
   
@@ -44,7 +45,7 @@ export default function Checkout() {
 
   const handlePayment = async () => {
     try {
-      const res = await createCheckoutSession(bookingDetails._id).unwrap();
+      const res = await createCheckoutSession({ bookingId: bookingDetails._id, paymentType }).unwrap();
       if (res?.data?.url) {
         window.location.href = res.data.url;
       } else {
@@ -110,9 +111,64 @@ export default function Checkout() {
               Final Invoice
             </h4>
             
+            <div className="flex flex-col gap-4 mb-6 pb-6 border-b border-white/10">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-white/60">Calculated Total</span>
+                <span className="text-white/90">${bookingDetails.totalAmount.toFixed(2)}</span>
+              </div>
+              {bookingDetails.minimumFee > 0 && (
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-white/60">Minimum Booking Amount</span>
+                  <span className="text-white/90">${bookingDetails.minimumFee.toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+
+            {bookingDetails.minimumFee > 0 && bookingDetails.totalAmount > bookingDetails.minimumFee ? (
+              <div className="flex flex-col gap-4 mb-8">
+                <p className="text-xs text-[#E5C37A] font-bold uppercase tracking-widest mb-2">Payment Options</p>
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${paymentType === 'full' ? 'border-[#E5C37A] bg-[#E5C37A]/10' : 'border-white/10 hover:border-white/30'}`}>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="radio" 
+                      name="paymentType" 
+                      value="full" 
+                      checked={paymentType === 'full'} 
+                      onChange={() => setPaymentType('full')}
+                      className="accent-[#E5C37A] w-4 h-4 cursor-pointer"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm">Pay Full Amount</span>
+                      <span className="text-xs text-white/50">Complete your payment now</span>
+                    </div>
+                  </div>
+                  <span className="font-serif font-bold text-lg">${bookingDetails.totalAmount.toFixed(2)}</span>
+                </label>
+                <label className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${paymentType === 'minimum' ? 'border-[#E5C37A] bg-[#E5C37A]/10' : 'border-white/10 hover:border-white/30'}`}>
+                  <div className="flex items-center gap-3">
+                    <input 
+                      type="radio" 
+                      name="paymentType" 
+                      value="minimum" 
+                      checked={paymentType === 'minimum'} 
+                      onChange={() => setPaymentType('minimum')}
+                      className="accent-[#E5C37A] w-4 h-4 cursor-pointer"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm">Pay Minimum Deposit</span>
+                      <span className="text-xs text-white/50">Pay the minimum to secure booking</span>
+                    </div>
+                  </div>
+                  <span className="font-serif font-bold text-lg">${bookingDetails.minimumFee.toFixed(2)}</span>
+                </label>
+              </div>
+            ) : null}
+
             <div className="flex justify-between items-baseline">
-              <span className="text-white/80 font-medium">Total Amount Due</span>
-              <span className="text-4xl font-bold font-serif text-[#E5C37A]">${bookingDetails.totalAmount.toFixed(2)}</span>
+              <span className="text-white/80 font-medium">Amount to Pay Now</span>
+              <span className="text-4xl font-bold font-serif text-[#E5C37A]">
+                ${(paymentType === 'minimum' && bookingDetails.minimumFee > 0 ? bookingDetails.minimumFee : bookingDetails.totalAmount).toFixed(2)}
+              </span>
             </div>
           </div>
 

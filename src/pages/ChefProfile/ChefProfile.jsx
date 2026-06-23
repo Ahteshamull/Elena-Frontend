@@ -476,7 +476,7 @@ export default function ChefProfile() {
                 </span>
                 <div className="text-3xl font-serif text-gray-900">
                   {profileResponse?.startingPricePerPerson
-                    ? `$${profileResponse.startingPricePerPerson * guests}`
+                    ? `$${Math.max(profileResponse.minimumBookingAmount || 0, profileResponse.startingPricePerPerson * guests)}`
                     : "TBD"}
                   <span className="text-sm font-sans font-normal text-gray-400 ml-2 italic tracking-normal">
                     for {guests} guest{guests !== 1 ? "s" : ""}
@@ -531,7 +531,7 @@ export default function ChefProfile() {
                   startingPricePerPerson:
                     profileResponse?.startingPricePerPerson || 0,
                   totalPrice: profileResponse?.startingPricePerPerson
-                    ? profileResponse.startingPricePerPerson * guests
+                    ? Math.max(profileResponse.minimumBookingAmount || 0, profileResponse.startingPricePerPerson * guests)
                     : 0,
                 }}
               >

@@ -82,7 +82,8 @@ export default function Booking() {
   // Math calculations
   const guestCount = parseInt(watchedGuests) || 2;
   const pricePerPerson = finalPricePerPerson || 0;
-  const subtotal = pricePerPerson * guestCount;
+  const minimumFee = chefProfile?.minimumBookingAmount || 0;
+  const subtotal = Math.max(minimumFee, pricePerPerson * guestCount);
   const total = subtotal;
 
   // Scroll to top on load

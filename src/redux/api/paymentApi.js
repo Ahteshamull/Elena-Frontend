@@ -3,9 +3,10 @@ import { apiSlice } from './apiSlice';
 export const paymentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createCheckoutSession: builder.mutation({
-      query: (bookingId) => ({
+      query: ({ bookingId, paymentType }) => ({
         url: `/payment/checkout/${bookingId}`,
         method: 'POST',
+        body: { paymentType },
       }),
     }),
     verifyPayment: builder.query({
