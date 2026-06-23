@@ -52,7 +52,7 @@ const ChefBookingDetails = () => {
     );
   }
 
-  const { bookingDetails, clientInfo = {} } = bookingData;
+  const { bookingDetails, clientInfo } = bookingData;
 
   const formatDate = (dateString) => {
     if (!dateString) return "TBD";
@@ -72,12 +72,12 @@ const ChefBookingDetails = () => {
   };
 
   const clientName =
-    clientInfo.userName ||
-    `${bookingDetails.firstName || ""} ${bookingDetails.lastName || ""}`.trim() ||
+    clientInfo?.userName ||
+    `${bookingDetails?.firstName || ""} ${bookingDetails?.lastName || ""}`.trim() ||
     "Client";
-  const clientImage = getImageUrl(clientInfo.image);
-  const clientEmail = clientInfo.email || bookingDetails.email || "N/A";
-  const clientPhone = bookingDetails.phone || clientInfo.phone || "N/A";
+  const clientImage = getImageUrl(clientInfo?.image);
+  const clientEmail = clientInfo?.email || bookingDetails?.email || "N/A";
+  const clientPhone = bookingDetails?.phone || clientInfo?.phone || "N/A";
 
   const totalAmount = bookingDetails.totalAmount || 0;
   const subtotal = (totalAmount * 0.8).toFixed(2);
