@@ -13,6 +13,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useCreateBookingMutation } from '../../redux/api/bookingApi';
+import { useGetProfileByUserIdQuery } from '../../redux/api/profileApi';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
@@ -34,14 +35,21 @@ export default function Booking() {
   const navigate = useNavigate();
   
   const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
+  const { data: profileRes } = useGetProfileByUserIdQuery(chefId, { skip: !chefId });
+  const chefProfile = profileRes?.data || {};
 
   const bookingData = locationState.state || {};
   const { 
-    chefName = "Verified Chef", 
+    chefName = chefProfile.fullName || chefProfile.displayName || "Verified Chef", 
     guests: initialGuests = 2, 
     selectedDate = '', 
     startingPricePerPerson = 250 
   } = bookingData;
+
+  const finalPricePerPerson = chefProfile.startingPricePerPerson || startingPricePerPerson;
+  const chefStatus = chefProfile.status || "approved";
+  const travelRadius = chefProfile.travelRadius || 0;
+  const travelRadiusLocation = chefProfile.travelRadiusLocation || "Not specified";
 
   // Try to load user data from local storage
   const loggedInUser = JSON.parse(localStorage.getItem('user') || 'null');
@@ -73,7 +81,7 @@ export default function Booking() {
 
   // Math calculations
   const guestCount = parseInt(watchedGuests) || 2;
-  const pricePerPerson = startingPricePerPerson || 0;
+  const pricePerPerson = finalPricePerPerson || 0;
   const subtotal = pricePerPerson * guestCount;
   const total = subtotal;
 
@@ -289,9 +297,23 @@ export default function Booking() {
                 </div>
               </div>
 
-              <div className="pt-5 flex justify-between items-center border-t border-gray-50 mt-5">
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">starting rate</span>
-                <span className="text-xl font-bold font-serif text-primary-900">${pricePerPerson} <span className="text-xs font-sans font-normal text-gray-400">/ person</span></span>
+              <div className="flex flex-col gap-3 mt-5 pt-5 border-t border-gray-50">
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">status</span>
+                  <span className="text-sm font-bold text-primary-900 capitalize">{chefStatus}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">travel radius</span>
+                  <span className="text-sm font-bold text-primary-900">{travelRadius} miles</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">base location</span>
+                  <span className="text-sm font-bold text-primary-900 text-right max-w-[150px] truncate" title={travelRadiusLocation}>{travelRadiusLocation}</span>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-50 mt-2">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">starting rate</span>
+                  <span className="text-xl font-bold font-serif text-primary-900">${pricePerPerson} <span className="text-xs font-sans font-normal text-gray-400">/ person</span></span>
+                </div>
               </div>
             </div>
 
