@@ -22,13 +22,26 @@ const bookingSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().regex(/^\+?[0-9\s\-]{8,}$/, 'Please enter a valid phone number (e.g. +880...)'),
+  countryCode: z.string().min(1, 'Required'),
+  phone: z.string().regex(/^[0-9\s\-]{6,}$/, 'Please enter a valid phone number'),
   location: z.string().min(5, 'Please enter a valid address'),
   eventDate: z.string().min(1, 'Please select a date'),
   arrivalTime: z.string().min(1, 'Please select a time'),
   numberOfGuests: z.string().min(1, 'Please select number of guests'),
   notes: z.string().optional(),
 });
+
+const timeOptions = [];
+for (let i = 6; i <= 23; i++) {
+  for (let j = 0; j < 60; j += 30) {
+    const hour = i % 12 === 0 ? 12 : i % 12;
+    const minute = j === 0 ? '00' : '30';
+    const ampm = i < 12 ? 'AM' : 'PM';
+    const label = `${hour}:${minute} ${ampm}`;
+    const value = `${i.toString().padStart(2, '0')}:${minute}`;
+    timeOptions.push({ label, value });
+  }
+}
 
 export default function Booking() {
   const { chefId } = useParams();
@@ -66,6 +79,7 @@ export default function Booking() {
       firstName: loggedInUser?.name?.split(' ')[0] || '',
       lastName: loggedInUser?.name?.split(' ')[1] || '',
       email: loggedInUser?.email || '',
+      countryCode: '+000',
       phone: '',
       location: '',
       eventDate: selectedDate,
@@ -105,7 +119,7 @@ export default function Booking() {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
-        phone: data.phone,
+        phone: `${data.countryCode} ${data.phone}`,
         eventLocation: data.location,
         eventDate: data.eventDate,
         arrivalTime: data.arrivalTime,
@@ -203,14 +217,34 @@ export default function Booking() {
                 {/* Phone */}
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-primary-900 uppercase tracking-widest">Phone Number</label>
-                  <Input 
-                    type="tel" 
-                    placeholder="(555) 000-0000" 
-                    icon={Phone} 
-                    error={errors.phone?.message} 
-                    {...register('phone')}
-                    className="h-12 rounded-xl border-gray-200"
-                  />
+                  <div className="flex gap-2">
+                    <div className="w-1/3 min-w-[105px]">
+                      <Select 
+                        options={[
+                          { label: '🇺🇸 +1', value: '+1' },
+                          { label: '🇬🇧 +44', value: '+44' },
+                          { label: '🇧🇩 +880', value: '+880' },
+                          { label: '🇮🇳 +91', value: '+91' },
+                          { label: '🇵🇰 +92', value: '+92' },
+                          { label: '🇦🇪 +971', value: '+971' },
+                          { label: '🇦🇺 +61', value: '+61' },
+                        ]}
+                        error={errors.countryCode?.message}
+                        {...register('countryCode')}
+                        className="h-12 rounded-xl border-gray-200"
+                      />
+                    </div>
+                    <div className="w-2/3 flex-1">
+                      <Input 
+                        type="tel" 
+                        placeholder="1700 000000" 
+                        icon={Phone} 
+                        error={errors.phone?.message} 
+                        {...register('phone')}
+                        className="h-12 rounded-xl border-gray-200"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Location */}
@@ -240,11 +274,11 @@ export default function Booking() {
                 {/* Booking Time */}
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-primary-900 uppercase tracking-widest">Arrival Time</label>
-                  <Input 
-                    type="time" 
+                  <Select 
+                    options={timeOptions}
                     error={errors.arrivalTime?.message} 
                     {...register('arrivalTime')}
-                    className="h-12 rounded-xl border-gray-200 pr-4"
+                    className="h-12 rounded-xl border-gray-200"
                   />
                 </div>
 
