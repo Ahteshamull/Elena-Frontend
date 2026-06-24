@@ -32,7 +32,8 @@ export const ChefSidebar = () => {
   };
 
   return (
-    <aside className="w-64 hidden md:flex flex-col bg-white border-r border-gray-100 min-h-[calc(100vh-80px)] sticky top-20">
+    <aside className="w-full md:w-64 flex flex-col bg-white border-r border-gray-100 min-h-[calc(100vh-80px)] sticky top-20">
+
       <div className="flex-1 py-8 px-4 flex flex-col gap-2">
         <div className="px-4 mb-6">
           <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Chef Console</span>
