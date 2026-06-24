@@ -20,7 +20,6 @@ const chefMenuItems = [
   { id: 'earnings', label: 'Earnings', icon: Wallet, path: '/chef-dashboard/earnings' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/chef-dashboard/messages' },
   { id: 'profile', label: 'Chef Profile', icon: UserCircle, path: '/chef-dashboard/profile' },
-  { id: 'onbording', label: 'Bank Onboarding', icon: Landmark, path: '/chef-dashboard/bank-onboarding' },
 ];
 
 export const ChefSidebar = () => {
@@ -32,7 +31,7 @@ export const ChefSidebar = () => {
   };
 
   return (
-    <aside className="w-full md:w-64 flex flex-col bg-white border-r border-gray-100 min-h-[calc(100vh-80px)] sticky top-20">
+    <aside className="w-64 hidden md:flex flex-col bg-white border-r border-gray-100 min-h-[calc(100vh-80px)] sticky top-20">
 
       <div className="flex-1 py-8 px-4 flex flex-col gap-2">
         <div className="px-4 mb-6">
@@ -63,7 +62,30 @@ export const ChefSidebar = () => {
         })}
       </div>
 
-      <div className="p-4 border-t border-gray-50">
+      <div className="p-4 border-t border-gray-50 flex flex-col gap-1.5">
+        <Link
+          to="/chef-dashboard/bank-onboarding"
+          className={cn(
+            "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
+            location.pathname === '/chef-dashboard/bank-onboarding'
+              ? "bg-primary-900 text-white shadow-lg"
+              : "text-gray-500 hover:bg-gray-50 hover:text-primary-900"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <Landmark 
+              size={20} 
+              className={cn(
+                location.pathname === '/chef-dashboard/bank-onboarding' 
+                  ? "text-accent" 
+                  : "text-gray-500 group-hover:text-accent transition-colors"
+              )} 
+            />
+            <span className="text-sm font-bold tracking-tight">Bank Onboarding</span>
+          </div>
+          {location.pathname === '/chef-dashboard/bank-onboarding' && <ChevronRight size={14} className="text-accent" />}
+        </Link>
+
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3.5 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-2xl group"

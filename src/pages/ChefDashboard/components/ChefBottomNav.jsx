@@ -7,6 +7,7 @@ import {
   Wallet,
   UserCircle,
   MessageSquare,
+  Landmark,
 } from 'lucide-react';
 import { cn } from '../../../utils/cn';
 
@@ -17,6 +18,7 @@ const chefMenuItems = [
   { id: 'earnings', label: 'Earnings', icon: Wallet, path: '/chef-dashboard/earnings' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/chef-dashboard/messages' },
   { id: 'profile', label: 'Profile', icon: UserCircle, path: '/chef-dashboard/profile' },
+  { id: 'onbording', label: 'Onboarding', icon: Landmark, path: '/chef-dashboard/bank-onboarding' },
 ];
 
 export const ChefBottomNav = () => {
