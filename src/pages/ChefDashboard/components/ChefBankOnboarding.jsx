@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Building2, ShieldCheck, Banknote, Loader2 } from 'lucide-react';
@@ -6,6 +6,25 @@ import { useStripeAccountOnboardingMutation } from '../../../redux/api/paymentAp
 
 const ChefBankOnboarding = () => {
   const [triggerOnboarding, { isLoading, data, error }] = useStripeAccountOnboardingMutation();
+  const [showRedirectModal, setShowRedirectModal] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+
+  useEffect(() => {
+    let timer;
+    if (showRedirectModal) {
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            window.location.href = "https://dashboard.stripe.com/connect";
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [showRedirectModal]);
 
   const handleConnectBank = async () => {
     try {
@@ -16,7 +35,7 @@ const ChefBankOnboarding = () => {
     } catch (err) {
       console.error("Failed to connect bank:", err);
       if (err?.data?.error?.includes('dashboard.stripe.com/connect')) {
-        window.location.href = "https://dashboard.stripe.com/connect";
+        setShowRedirectModal(true);
       }
     }
   };
@@ -98,6 +117,33 @@ const ChefBankOnboarding = () => {
           </div>
         </div>
       </Card>
+
+      {/* Redirect Modal */}
+      {showRedirectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl flex flex-col items-center text-center animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-6">
+              <Building2 className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Redirecting to Stripe</h3>
+            <p className="text-gray-500 mb-6">
+              You need to complete your Connect account setup on Stripe first. Redirecting in {countdown} seconds...
+            </p>
+            <div className="w-full bg-gray-100 rounded-full h-2 mb-4 overflow-hidden">
+              <div 
+                className="bg-indigo-600 h-2 rounded-full transition-all duration-1000 ease-linear" 
+                style={{ width: `${((3 - countdown) / 3) * 100}%` }}
+              ></div>
+            </div>
+            <Button 
+              onClick={() => window.location.href = "https://dashboard.stripe.com/connect"}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3"
+            >
+              Redirect Now
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
