@@ -15,6 +15,9 @@ const ChefBankOnboarding = () => {
       }
     } catch (err) {
       console.error("Failed to connect bank:", err);
+      if (err?.data?.error?.includes('dashboard.stripe.com/connect')) {
+        window.location.href = "https://dashboard.stripe.com/connect";
+      }
     }
   };
 
