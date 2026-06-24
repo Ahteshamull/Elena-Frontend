@@ -37,7 +37,7 @@ const ChefBankOnboarding = () => {
       }
     } catch (err) {
       console.error("Failed to connect bank:", err);
-      const errorMsg = err?.data?.error || '';
+      const errorMsg = typeof err?.data?.error === 'string' ? err.data.error : '';
       if (errorMsg.includes('dashboard.stripe.com/connect')) {
         setRedirectUrl("https://dashboard.stripe.com/connect");
         setShowRedirectModal(true);
