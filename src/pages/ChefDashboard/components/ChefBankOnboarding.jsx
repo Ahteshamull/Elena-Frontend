@@ -7,6 +7,7 @@ import { useStripeAccountOnboardingMutation } from '../../../redux/api/paymentAp
 const ChefBankOnboarding = () => {
   const [triggerOnboarding, { isLoading, data, error }] = useStripeAccountOnboardingMutation();
   const [showRedirectModal, setShowRedirectModal] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState('');
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
@@ -16,7 +17,9 @@ const ChefBankOnboarding = () => {
         setCountdown((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
-            window.location.href = "https://dashboard.stripe.com/connect";
+            if (redirectUrl) {
+              window.location.href = redirectUrl;
+            }
             return 0;
           }
           return prev - 1;
@@ -24,7 +27,7 @@ const ChefBankOnboarding = () => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [showRedirectModal]);
+  }, [showRedirectModal, redirectUrl]);
 
   const handleConnectBank = async () => {
     try {
@@ -34,7 +37,12 @@ const ChefBankOnboarding = () => {
       }
     } catch (err) {
       console.error("Failed to connect bank:", err);
-      if (err?.data?.error?.includes('dashboard.stripe.com/connect')) {
+      const errorMsg = err?.data?.error || '';
+      if (errorMsg.includes('dashboard.stripe.com/connect')) {
+        setRedirectUrl("https://dashboard.stripe.com/connect");
+        setShowRedirectModal(true);
+      } else if (errorMsg.includes('dashboard.stripe.com/account/applications/settings')) {
+        setRedirectUrl("https://dashboard.stripe.com/account/applications/settings");
         setShowRedirectModal(true);
       }
     }
@@ -136,7 +144,9 @@ const ChefBankOnboarding = () => {
               ></div>
             </div>
             <Button 
-              onClick={() => window.location.href = "https://dashboard.stripe.com/connect"}
+              onClick={() => {
+                if (redirectUrl) window.location.href = redirectUrl;
+              }}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3"
             >
               Redirect Now
