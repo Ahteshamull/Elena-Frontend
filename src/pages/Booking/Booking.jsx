@@ -22,11 +22,12 @@ const bookingSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  phone: z.string().regex(/^\+?[0-9\s\-]{8,}$/, 'Please enter a valid phone number (e.g. +880...)'),
   location: z.string().min(5, 'Please enter a valid address'),
   eventDate: z.string().min(1, 'Please select a date'),
   arrivalTime: z.string().min(1, 'Please select a time'),
   numberOfGuests: z.string().min(1, 'Please select number of guests'),
+  notes: z.string().optional(),
 });
 
 export default function Booking() {
@@ -70,6 +71,7 @@ export default function Booking() {
       eventDate: selectedDate,
       arrivalTime: '',
       numberOfGuests: String(initialGuests),
+      notes: '',
     },
   });
 
@@ -108,6 +110,7 @@ export default function Booking() {
         eventDate: data.eventDate,
         arrivalTime: data.arrivalTime,
         numberOfGuests: parseInt(data.numberOfGuests, 10),
+        notes: data.notes,
       };
 
       const res = await createBooking({ chefId, body: payload }).unwrap();
@@ -255,6 +258,19 @@ export default function Booking() {
                     {...register('numberOfGuests')}
                     className="h-12 rounded-xl border-gray-200"
                   />
+                </div>
+
+                {/* Description/Note */}
+                <div className="flex flex-col gap-2 col-span-1 md:col-span-2">
+                  <label className="text-xs font-bold text-primary-900 uppercase tracking-widest">Description / Note</label>
+                  <textarea 
+                    placeholder="Any special instructions or event details..." 
+                    {...register('notes')}
+                    className={`flex min-h-[100px] w-full rounded-xl border ${errors.notes ? 'border-red-500 focus:ring-red-500' : 'border-gray-200'} bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-900 focus:border-transparent transition-colors duration-150 ease-in-out`}
+                  />
+                  {errors.notes && (
+                    <p className="mt-1 text-xs text-red-500">{errors.notes.message}</p>
+                  )}
                 </div>
               </div>
 
